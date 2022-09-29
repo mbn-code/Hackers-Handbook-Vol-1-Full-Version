@@ -1,10 +1,4 @@
-# mbn-site
-
----
-title: Introduction
-description: Docs intro
-layout: ../../layouts/MainLayout.astro
----
+# Hackers Handbook Vol. 1
 
 **Welcome to *Hackers Handbook* Vol. 1!**
 
