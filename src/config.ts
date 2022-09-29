@@ -53,6 +53,7 @@ export const SIDEBAR: Sidebar = {
 			{ text: 'Virtual machiens', link: 'en/page-3' },
 			{ text: "Nmap", link: "en/page-4"},
 			{ text: 'Phishing', link: 'en/page-5'},
+			{ text: "Metasploitable vm setup", link: "en/page-metasploitable"},
 			{ text: 'Metasploit', link: 'en/page-6'},
 		],
 		'Sub-subjects': [
