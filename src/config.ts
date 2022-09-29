@@ -55,6 +55,7 @@ export const SIDEBAR: Sidebar = {
 			{ text: 'Phishing', link: 'en/page-5'},
 			{ text: "Metasploitable vm setup", link: "en/page-metasploitable"},
 			{ text: 'Metasploit', link: 'en/page-6'},
+			{ text: "Metasploit Video Example", link: "en/page-metasploitVideoExample"}
 		],
 		'Sub-subjects': [
 			{ text: 'About me', link: 'en/page-about' },
