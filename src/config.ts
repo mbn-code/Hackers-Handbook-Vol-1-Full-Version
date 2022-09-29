@@ -32,7 +32,7 @@ export const KNOWN_LANGUAGE_CODES = Object.values(KNOWN_LANGUAGES);
 
 export const GITHUB_EDIT_URL = `https://github.com/withastro/astro/tree/main/examples/docs`;
 
-export const COMMUNITY_INVITE_URL = `https://astro.build/chat`;
+export const COMMUNITY_INVITE_URL = `https://discord.gg/eEYyhQqHJv`;
 
 // See "Algolia" section of the README for more information.
 export const ALGOLIA = {
@@ -51,9 +51,21 @@ export const SIDEBAR: Sidebar = {
 			{ text: 'Introduction', link: 'en/introduction' },
 			{ text: 'Operating systems', link: 'en/page-2' },
 			{ text: 'Virtual machiens', link: 'en/page-3' },
+			{ text: "Nmap", link: "en/page-4"},
 			{ text: 'Phishing', link: 'en/page-5'},
 			{ text: 'Metasploit', link: 'en/page-6'},
 		],
-		'Sub-subjects': [{ text: 'About me', link: 'en/page-about' }],
+		'Sub-subjects': [
+			{ text: 'About me', link: 'en/page-about' },
+		],
+		'Words and answers' : [
+			{ text: "Computer Hardware", link: "en/page-hardware"},
+			{ text: "IP Address", link: "en/page-ip"},
+			{ text: "Host", link: "en/page-host"},
+			{ text: "localhost", link: "en/page-localhost" },
+			{ text: "Apt package Maneger", link: "en/page-apt"},
+			
+		],
+
 	},
 };
