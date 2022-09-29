@@ -1,6 +1,6 @@
 export const SITE = {
-	title: 'Documentation',
-	description: 'Your website description.',
+	title: 'Hackers Handbook Vol. 1',
+	description: 'This website / documentation / Tutorial is about teaching beginners or more advandes hackers how to use different tools.\n As this is a handbook you can also use this as a cheat sheet.',
 	defaultLanguage: 'en_US',
 };
 
@@ -47,11 +47,13 @@ export type Sidebar = Record<
 >;
 export const SIDEBAR: Sidebar = {
 	en: {
-		'Section Header': [
+		'Sections': [
 			{ text: 'Introduction', link: 'en/introduction' },
-			{ text: 'Page 2', link: 'en/page-2' },
-			{ text: 'Page 3', link: 'en/page-3' },
+			{ text: 'Operating systems', link: 'en/page-2' },
+			{ text: 'Virtual machiens', link: 'en/page-3' },
+			{ text: 'Phishing', link: 'en/page-5'},
+			{ text: 'Metasploit', link: 'en/page-6'},
 		],
-		'Another Section': [{ text: 'Page 4', link: 'en/page-4' }],
+		'Sub-subjects': [{ text: 'About me', link: 'en/page-about' }],
 	},
 };

@@ -1,14 +1,16 @@
 ---
-title: Page 2
-description: Lorem ipsum dolor sit amet - 2
+title: Operating systems
+description: Get taught what an operating system is and why it's important to know
 layout: ../../layouts/MainLayout.astro
 ---
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+## What is an operating system (OS)
 
 Sed flavum. Stridore nato, Alcandrumque desint ostendit derat, longoque, eadem
 iunxit miserum pedum pectora. Liberat sine pignus cupit, ferit mihi venias
 amores, et quod, maduere haec _gravi_ contentusque heros. Qui suae attonitas.
+
+## Why are we getting this taught
 
 _Acta caelo_ ego, hoc illi ferroque, qui fluitque Achillis deiecerat erat
 inhospita arasque ad sume et aquis summo. Fugerat ipse iam. Funeris Iuno Danaos
