@@ -65,9 +65,8 @@ function removeDups(arr: Commit[]) {
 
 const data = await getCommits(url);
 const unique = removeDups(data);
-const recentContributors = unique.slice(0, 3); // only show avatars for the 3 most recent contributors
-const additionalContributors = unique.length - recentContributors.length; // list the rest of them as # of extra contributors
 ---
+
 
 <style>
 	.avatar-list {
