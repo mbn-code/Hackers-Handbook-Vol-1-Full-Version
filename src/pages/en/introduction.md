@@ -1,6 +1,6 @@
 ---
 title: Introduction
-description: Docs intro
+description: Introduction to hackers handbook
 layout: ../../layouts/MainLayout.astro
 ---
 
