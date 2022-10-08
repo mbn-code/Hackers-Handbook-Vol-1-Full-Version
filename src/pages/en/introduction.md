@@ -23,7 +23,7 @@ This is the `docs` and `handbook` for learning or getting the basics updated in 
 
 This is a question most begginers might not ask, but it is important to understand that it is not what you see in most movies. It is not the 3D objects spinning on computers, or terminal emulators spitting out a masive amount of information (most of the time) that is all in all useless. 
 
-It is all completely different. Looking at the show mr. roboxt it's a good comparison to what `real` hacking could look like. But as in mr. robot where everything seems easy, it is not always like that in the real world, you will incounter many errors and doing the same things again and again, only changingn one veriable at a time. "Trial and Error".
+It is all completely different. Looking at the show Mr. robot it's a good comparison to what `real` hacking could look like. But as in Mr. robot where everything seems easy, it is not always like that in the real world, you will incounter many errors and doing the same things again and again, only changingn one veriable at a time. "Trial and Error".
 
 ## How do you get started🤷
 
