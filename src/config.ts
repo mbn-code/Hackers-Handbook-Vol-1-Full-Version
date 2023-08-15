@@ -55,7 +55,8 @@ export const SIDEBAR: Sidebar = {
 			{ text: 'Phishing', link: 'en/page-5'},
 			{ text: 'Metasploit', link: 'en/page-6'},
 			{ text: "Metasploitable vm setup", link: "en/page-metasploitable"},
-			{ text: "Metasploit Video Example", link: "en/page-metasploitVideoExample"}
+			{ text: "Metasploit Video Example", link: "en/page-metasploitVideoExample"},
+			{ text: "Social Engineering", link: "en/page-socialEngineering"}
 		],
 		'Words and answers' : [
 			{ text: "Computer Hardware", link: "en/page-hardware"},
