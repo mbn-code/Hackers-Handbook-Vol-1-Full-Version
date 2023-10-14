@@ -57,9 +57,10 @@ export const SITE = {
 		{ text: 'Metasploitable vm setup', link: 'en/page-metasploitable' },
 		{ text: 'Metasploit Video Example', link: 'en/page-metasploitVideoExample' },
 		{ text: 'Social Engineering', link: 'en/page-socialEngineering' },
-		// Add the new pages here
+
 		{ text: 'Bash Scripting in Hacking', link: 'en/page-bash' },
-		{ text: 'Python in Hacking', link: 'en/page-7' }
+		{ text: 'Python in Hacking', link: 'en/page-7' },
+		{ text: 'Where to start hacking?', link: 'en/where-to-start' }
 	  ],
 	  'Words and answers': [
 		{ text: 'Computer Hardware', link: 'en/page-hardware' },
