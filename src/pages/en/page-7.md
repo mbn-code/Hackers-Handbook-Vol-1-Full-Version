@@ -4,8 +4,6 @@ description: The Role of Scripting in Hacking and its Versatile Applications
 layout: ../../layouts/MainLayout.astro
 ---
 
-# Scripting in Hacking
-
 Scripting is a fundamental component of hacking and cybersecurity, providing hackers and security professionals with the tools needed to automate tasks, exploit vulnerabilities, and enhance their effectiveness. In this page, we'll explore the role of scripting in hacking, its versatile applications, and its significance in the world of cybersecurity.
 
 ## The Significance of Scripting
