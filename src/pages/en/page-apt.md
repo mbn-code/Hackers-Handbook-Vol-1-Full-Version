@@ -1,6 +1,6 @@
 ---
 title: Apt package maneger 
-description: What is metasploit, what do we use it for and how can we use it. 
+description: What is Apt and what is it used for. 
 layout: ../../layouts/MainLayout.astro
 ---
 
