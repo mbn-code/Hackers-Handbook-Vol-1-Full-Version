@@ -1,9 +1,3 @@
----
-title: Introduction
-description: Introduction to Hackers Handbook
-layout: ../../layouts/MainLayout.astro
----
-
 # Welcome to the *Hackers Handbook* Vol. 1! 🔒💻
 
 **Please Note:** *This resource is intended solely for educational purposes. We do not endorse or take responsibility for any actions taken that may lead to legal issues. Using hacking techniques for malicious purposes on unauthorized systems is illegal and unethical.* ❗
