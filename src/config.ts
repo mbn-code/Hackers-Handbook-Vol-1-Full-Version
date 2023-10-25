@@ -45,23 +45,39 @@ export const SITE = {
 	typeof KNOWN_LANGUAGE_CODES[number],
 	Record<string, { text: string; link: string }[]>
   >;
-  export const SIDEBAR: Sidebar = {
+  export const SIDEBAR = {
 	en: {
-	  'Sections': [
+	  // Introduction and Basics
+	  'Introduction': [
 		{ text: 'Introduction', link: 'en/introduction' },
-		{ text: 'Operating systems', link: 'en/page-2' },
-		{ text: 'Virtual machines', link: 'en/page-3' },
+		{ text: 'Where to Start Hacking?', link: 'en/where-to-start' },
+	  ],
+  
+	  // Fundamentals
+	  'Fundamentals': [
+		{ text: 'Computer Hardware', link: 'en/page-hardware' },
+		{ text: 'Operating Systems', link: 'en/page-2' },
+		{ text: 'Virtual Machines', link: 'en/page-3' },
+		{ text: 'Networking', link: 'en/page-networking' },
+		{ text: 'IP Address', link: 'en/page-ip' },
+		{ text: 'Host', link: 'en/page-host' },
+	  ],
+  
+	  // Hacking Tools and Techniques
+	  'Hacking Tools and Techniques': [
 		{ text: 'Nmap', link: 'en/page-4' },
 		{ text: 'Phishing', link: 'en/page-5' },
 		{ text: 'Metasploit', link: 'en/page-6' },
-		{ text: 'Metasploitable vm setup', link: 'en/page-metasploitable' },
+		{ text: 'Metasploitable VM Setup', link: 'en/page-metasploitable' },
 		{ text: 'Metasploit Video Example', link: 'en/page-metasploitVideoExample' },
 		{ text: 'Social Engineering', link: 'en/page-socialEngineering' },
 		{ text: 'Bash Scripting in Hacking', link: 'en/page-bash' },
 		{ text: 'Python in Hacking', link: 'en/page-7' },
-		{ text: 'Where to start hacking?', link: 'en/where-to-start' },
+	  ],
+  
+	  // Advanced Topics
+	  'Advanced Topics': [
 		{ text: 'Cryptography', link: 'en/page-cryptography' },
-		{ text: 'Networking', link: 'en/page-networking' },
 		{ text: 'Web Hacking', link: 'en/page-web-hacking' },
 		{ text: 'Wireless Hacking', link: 'en/page-wireless-hacking' },
 		{ text: 'Ethical Hacking Methodologies', link: 'en/page-ethical-hacking' },
@@ -80,15 +96,13 @@ export const SITE = {
 		{ text: 'Red Team and Blue Team Concepts', link: 'en/page-red-blue-teams' },
 		{ text: 'Secure Coding', link: 'en/page-secure-coding' },
 		{ text: 'Secure Password Management', link: 'en/page-secure-passwords' },
-		{ text: 'Update and Stay Current', link: 'en/page-stay-current' }
+		{ text: 'Update and Stay Current', link: 'en/page-stay-current' },
 	  ],
-	  'Words and answers': [
-		{ text: 'Computer Hardware', link: 'en/page-hardware' },
-		{ text: 'IP Address', link: 'en/page-ip' },
-		{ text: 'Host', link: 'en/page-host' },
-		{ text: 'localhost', link: 'en/page-localhost' },
-		{ text: 'Apt package Manager', link: 'en/page-apt' }
-	  ]
+  
+	  // Additional References
+	  'Words and Answers': [
+		{ text: 'Apt Package Manager', link: 'en/page-apt' },
+	  ],
 	}
   };
   
