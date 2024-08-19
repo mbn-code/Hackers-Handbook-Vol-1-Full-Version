@@ -28,5 +28,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.1.0",
     "tailwind": "^4.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
   }
 }
