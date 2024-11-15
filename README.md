@@ -1,5 +1,9 @@
 # Hey there! Welcome to the Hackers Handbook Vol. 1! 🚀
 
+If you find this handbook helpful and want to support our work, consider visiting our Patreon page. Your support helps us create more valuable content and keep this project going. Thank you! 🙏
+
+[Support me on Patreon](https://www.patreon.com/icysponge/shop/hackers-handbook-vol-1-103217?utm_medium=clipboard_copy&utm_source=copyLink&utm_campaign=productshare_creator&utm_content=join_link)
+
 **Quick heads up:** *We made this handbook just for learning. Using these techniques for anything malicious isn't just uncool - it's illegal.* ❗
 
 Curious about cybersecurity? Want to know what ethical hackers actually do? You're in the right place! Whether you're just starting out or looking to level up your skills, this handbook is your friendly guide to the digital security world. 
@@ -46,4 +50,3 @@ Prepare to embark on an educational adventure into the world of hacking and digi
 - Practical exercises to apply your knowledge in real-world scenarios.
 
 Let's dive into the exciting realm of cybersecurity and ethical hacking. Every challenge you encounter is an opportunity to learn, and every lesson brings you closer to mastering the art of hacking. Get ready to unlock the secrets of the digital world, one page at a time. 🌐📖
-
