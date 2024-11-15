@@ -1,6 +1,7 @@
 {
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
+    "target": "ES2017",
     "jsx": "preserve",
     "skipLibCheck": true
   }
