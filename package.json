@@ -23,7 +23,7 @@
     "astro": "^2.10.7",
     "datasette": "1.0.1",
     "flaschenpost": "^5.1.1",
-    "lodash": "4.17.12",
+    "lodash": "4.17.21",
     "preact": "^10.7.3",
     "react": "^18.2.0",
     "react-dom": "^18.1.0",
