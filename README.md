@@ -1,5 +1,8 @@
 # Hey there! Welcome to the Hackers Handbook Vol. 1! 🚀
 
+Find the Project here free online book :)
+[Hackers Handbook Vol 1 Full Version](https://hackers-handbook-vol-1.netlify.app/en/introduction/)
+
 If you find this handbook helpful and want to support our work, consider visiting our Patreon page. Your support helps us create more valuable content and keep this project going. Thank you! 🙏
 
 [Support me on Patreon](https://www.patreon.com/icysponge/shop/hackers-handbook-vol-1-103217?utm_medium=clipboard_copy&utm_source=copyLink&utm_campaign=productshare_creator&utm_content=join_link)
