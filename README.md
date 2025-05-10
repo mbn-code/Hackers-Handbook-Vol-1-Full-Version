@@ -92,7 +92,7 @@ If you find this handbook helpful, here’s how you can support me:
 ## 📬 Contact Me  
 
 For questions, suggestions, or collaboration opportunities:  
-- 📧 Email: **hackershandbook@support.com**  
+- 📧 Email: **malthe@mbn-code.dk**  
 - 🌐 Website: **[Hackers Handbook Online](https://hackers-handbook-vol-1.netlify.app/en/introduction/)**  
 
 ---
