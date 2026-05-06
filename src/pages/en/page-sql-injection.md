@@ -1,49 +1,43 @@
 ---
-title: SQL Injection
-description: A hacking technique where an attacker injects malicious SQL queries into input fields to manipulate a database and potentially gain unauthorized access.
+title: SQL Injection (SQLi) 
+description: A hacking technique where an attacker injects malicious SQL queries to manipulate a database.
 layout: ../../layouts/MainLayout.astro
 ---
 
-# SQL Injection
+# SQL Injection (SQLi) 
 
-SQL injection is a hacking technique where an attacker manipulates a web application's input fields to execute malicious SQL (Structured Query Language) queries on the application's database. This technique takes advantage of security vulnerabilities that allow the injection of unvalidated or malicious data, enabling attackers to interact directly with a database. SQL injection can have severe consequences, including unauthorized access to data, data manipulation, and even complete database compromise.
+**SQL Injection** is one of the oldest, most famous, and most dangerous web vulnerabilities in existence. It occurs when a web application takes untrusted user input and inserts it directly into a backend database query without proper sanitization.
 
-## How SQL Injection Works
+This allows an attacker to manipulate the  [Web Application](page-web-hacking) into executing malicious SQL (Structured Query Language) commands.
 
-SQL injection attacks target web applications that interact with databases, such as e-commerce sites, content management systems, and user login forms. The attack process typically involves the following steps:
+## How SQL Injection Works 
 
-1. **User Input:** The attacker identifies input fields within a web application where user input is not adequately validated or sanitized. This can include search boxes, login forms, or any field where users can input data.
+Imagine a login form. The PHP code running on the server might construct a database query that looks like this:
 
-2. **Injection:** The attacker submits malicious SQL code as part of the input data. This code may include SQL statements designed to manipulate the database, retrieve sensitive information, or modify existing data.
+```sql
+SELECT * FROM users WHERE username = 'USER_INPUT' AND password = 'PASSWORD_INPUT';
+```
 
-3. **Vulnerable Query Execution:** If the application does not properly validate or sanitize user input, it may directly execute the injected SQL code, as part of a database query.
+If a normal user types `admin` and `password123`, the query looks normal. But what if a hacker types `' OR '1'='1` into the username field, and leaves the password blank? The resulting query looks like this:
 
-4. **Database Interaction:** The injected SQL code interacts with the database, performing actions dictated by the attacker. This may include extracting user data, altering records, or compromising the database.
+```sql
+SELECT * FROM users WHERE username = '' OR '1'='1' AND password = '';
+```
 
-## Consequences of SQL Injection
+Because `1` always equals `1` (which is TRUE), the database returns the first user it finds,which is usually the site administrator! The hacker just bypassed the login screen without knowing the password!
 
-SQL injection attacks can have significant consequences, including:
+## Types of SQL Injection 
 
-1. **Unauthorized Data Access:** Attackers can access sensitive information stored in a database, such as user credentials, personal details, or financial records.
+1. **In-Band (Classic) SQLi:** The attacker uses the same channel of communication (the web page) to launch the attack and gather the results. E.g., injecting a `UNION` query to force the website to display credit card numbers on the screen.
+2. **Inferential (Blind) SQLi:** The web application is vulnerable, but it doesn't display database errors on the screen. The attacker must ask the database True/False questions (e.g., "Does the admin password start with 'A'?") and observe how long the server takes to respond (Time-Based) to extract data character by character.
+3. **Out-of-Band SQLi:** The attacker injects a command that forces the database server to make an external DNS or HTTP request back to a server the attacker controls.
 
-2. **Data Manipulation:** Attackers may modify, delete, or insert data into the database, leading to data corruption or loss.
+## Tools of the Trade 
 
-3. **Database Compromise:** In severe cases, SQL injection can result in complete compromise of the database system, allowing attackers full control over the data.
+While manual SQL injection is an art form, hackers often automate the process using tools like `sqlmap` or by intercepting requests in  [Burp Suite](page-burp-suite).
 
-4. **Data Exfiltration:** Attackers can extract data from the database and use it for malicious purposes or sell it on the dark web.
+## Defending Against SQLi 
 
-## Mitigating SQL Injection
+SQL Injection is 100% preventable. 
 
-Preventing SQL injection attacks is crucial for web application security. Mitigation strategies include:
-
-1. **Input Validation:** Implement strict input validation and sanitization to ensure that user input cannot contain malicious SQL code.
-
-2. **Prepared Statements:** Use prepared statements and parameterized queries to separate user input from SQL code.
-
-3. **Stored Procedures:** Encapsulate SQL logic in stored procedures, reducing the risk of direct SQL injection.
-
-4. **Web Application Firewall (WAF):** Deploy a WAF to monitor and filter incoming traffic, blocking known SQL injection patterns.
-
-5. **Regular Security Audits:** Conduct regular security audits and penetration testing to identify and address vulnerabilities.
-
-By understanding the risks and implementing robust security measures, developers can protect web applications against SQL injection attacks and maintain the confidentiality and integrity of their databases.
+Developers must use **Parameterized Queries (Prepared Statements)**. Instead of concatenating strings together, prepared statements force the database to treat user input *strictly* as data, not as executable code. Even if a user types `' OR '1'='1`, the database will literally look for a user whose name is exactly that string.

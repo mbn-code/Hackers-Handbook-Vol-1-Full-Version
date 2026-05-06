@@ -1,53 +1,40 @@
 ---
-title: Port Scanning
-description: The process of scanning a computer or network to identify open network ports and services, often used by attackers to find potential vulnerabilities.
+title: Port Scanning 
+description: The process of probing a computer to find open doors and vulnerable services.
 layout: ../../layouts/MainLayout.astro
 ---
 
-# Port Scanning
+# Port Scanning 
 
-Port scanning is a network reconnaissance technique used to identify open network ports and services running on a computer or network. It is a common practice in both legitimate network management and cybersecurity assessments. However, it can also be employed by malicious actors to find potential vulnerabilities and exploit them.
+Imagine you are a burglar trying to break into an office building. You wouldn't just smash the front window; you'd walk around the building, jiggling every door handle and checking every window to see which ones were left unlocked.
 
-## Understanding Ports
+**Port Scanning** is the digital equivalent of jiggling door handles.
 
-In computer networking, a **port** is a communication endpoint that is used to identify specific services or processes on a host or network device. Ports are numbered, and each number is associated with a particular service or protocol. For example, port 80 is commonly used for HTTP (Hypertext Transfer Protocol) traffic, while port 22 is used for SSH (Secure Shell) connections.
+In  [Networking](page-networking), every  [Host](page-host) has 65,535 virtual "ports". When a server wants to offer a service to the internet (like a website, email, or file sharing), it opens a specific port and listens for incoming connections. 
 
-## The Purpose of Port Scanning
+## Why We Scan Ports 
 
-Port scanning serves several purposes:
+Hackers and security professionals use Port Scanning to map out the attack surface of a target. You can't attack a web server if port 80 (HTTP) isn't open!
 
-1. **Network Inventory:** Legitimate network administrators use port scanning to identify and catalog the services and devices connected to their networks. This is crucial for network management and security.
+The industry standard tool for this job is  [Nmap (Network Mapper)](page-4). 
 
-2. **Security Assessments:** Cybersecurity professionals use port scanning as part of security assessments and penetration testing. By identifying open ports, they can assess potential vulnerabilities and weaknesses in a network's security.
+## Types of Port Scans 
 
-3. **Attackers' Reconnaissance:** Malicious actors use port scanning to gather information about potential targets. It helps them identify services and ports that may be vulnerable to attacks.
+Port scanning relies on the rules of the TCP 3-Way Handshake (SYN -> SYN/ACK -> ACK). 
 
-## Common Port Scanning Techniques
+### 1. TCP Connect Scan (Full Scan)
+The scanner completes the full 3-way handshake. If the target responds with a `SYN/ACK`, the port is open. The scanner then politely sends an `ACK` followed by an `RST` to tear down the connection.
+- **Pros:** Very reliable. Doesn't require  [Root Access](page-root-access) to run.
+- **Cons:** Very loud. Because a full connection is made, it will definitely be logged by the target's  [Firewall](page-firewall).
 
-There are various port scanning techniques, each with its own characteristics:
+### 2. SYN Scan (Stealth Scan)
+This is the default scan used by hackers. The scanner sends a `SYN` packet. If the target replies with `SYN/ACK` (meaning the port is open), the scanner immediately sends an `RST` (Reset) packet to drop the connection before the handshake finishes.
+- **Pros:** Faster, and historically it bypassed many older firewalls because a full connection was never established.
+- **Cons:** Requires root privileges to craft raw packets.
 
-1. **TCP Connect Scan:** This technique attempts to establish a full TCP connection with the target ports. It is the most reliable but also the most detectable method.
+### 3. UDP Scanning
+Not all services use TCP. Services like DNS and SNMP use UDP. UDP is "connectionless," meaning there is no handshake. Scanning UDP is notoriously difficult and slow because if a UDP port is open, it often doesn't reply at all!
 
-2. **TCP SYN Scan (Half-Open Scan):** This technique sends SYN packets to target ports and analyzes the responses. It is less detectable but still effective.
+## The Next Step: Enumeration 
 
-3. **UDP Scan:** UDP (User Datagram Protocol) ports are scanned to find open services. This method is used when an attacker suspects that services use UDP.
-
-4. **Stealth Scan (NULL, FIN, and Xmas):** These scans send packets with specific flags turned off. They are used to evade intrusion detection systems.
-
-5. **Idle Scanning:** An attacker uses a third-party host as a proxy to scan the target, making it harder to trace.
-
-## Risks and Countermeasures
-
-Port scanning can be a double-edged sword. While it can help organizations identify vulnerabilities, it can also be used for malicious purposes. To protect against unwanted port scans and potential vulnerabilities, network administrators can take the following measures:
-
-1. **Firewalls:** Use firewalls to block or restrict access to unused ports.
-
-2. **Intrusion Detection Systems (IDS):** Implement IDS to detect and respond to suspicious scanning activities.
-
-3. **Patch and Update:** Keep software and systems up to date to address known vulnerabilities.
-
-4. **Network Segmentation:** Segment your network to limit an attacker's lateral movement.
-
-5. **Security Awareness:** Educate employees about the risks of sharing sensitive information.
-
-Port scanning plays a crucial role in both securing and probing networks. Whether you are a network administrator looking to manage your systems or a security professional defending against cyber threats, understanding port scanning is essential to maintain the integrity and security of your network.
+Finding an open port is just step one. Once a port is found, the scanner performs **Service Enumeration**,sending specialized probes to figure out exactly what software (and what version) is running behind that port. If the scanner discovers an outdated version of Apache web server, the hacker can then look up an exploit for it!

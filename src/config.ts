@@ -70,6 +70,7 @@ export const SITE = {
 		{ text: 'Metasploit', link: 'en/page-6' },
 		{ text: 'Metasploitable VM Setup', link: 'en/page-metasploitable' },
 		{ text: 'Metasploit Video Example', link: 'en/page-metasploitVideoExample' },
+		{ text: 'Burp Suite', link: 'en/page-burp-suite' },
 		{ text: 'Social Engineering', link: 'en/page-socialEngineering' },
 		{ text: 'Bash Scripting in Hacking', link: 'en/page-bash' },
 		{ text: 'Python in Hacking', link: 'en/page-7' },
@@ -101,7 +102,7 @@ export const SITE = {
   
 	  // Additional References
 'Words and Answers': [
-  { text: 'Apt Package Manager', link: 'en/page-apt', description: 'A package manager commonly used in Debian-based Linux distributions for installing, updating, and managing software packages.' },
+  { text: 'Apt Package Manager', link: 'en/page-apt-package-manager', description: 'A package manager commonly used in Debian-based Linux distributions for installing, updating, and managing software packages.' },
   { text: 'Firewall', link: 'en/page-firewall', description: 'A security system that monitors and controls incoming and outgoing network traffic to prevent unauthorized access and protect against cyber threats.' },
   { text: 'VPN', link: 'en/page-vpn', description: 'A Virtual Private Network that creates a secure and encrypted connection over a less secure network, such as the internet, to ensure privacy and security.' },
   { text: 'Root Access', link: 'en/page-root-access', description: 'Full administrative access to a system or device, often required for certain advanced tasks and potentially risky if not managed carefully.' },
@@ -113,7 +114,7 @@ export const SITE = {
   { text: 'Brute Force Attack', link: 'en/page-brute-force-attack', description: 'A trial-and-error method of guessing a password or encryption key by systematically trying all possible combinations until the correct one is found.' },
   { text: 'Phishing Attack', link: 'en/page-phishing-attack', description: 'A fraudulent attempt to obtain sensitive information, such as login credentials and credit card details, by posing as a trustworthy entity in electronic communication.' },
   { text: 'SSL Certificate', link: 'en/page-ssl-certificate', description: 'A digital certificate that authenticates the identity of a website and encrypts data transmitted between the users browser and the web server.' },
-  { text: 'Two-Factor Authentication (2FA)', link: 'en/page-2fa', description: 'An extra layer of security that requires users to provide two different authentication factors, typically something they know (password) and something they have (a mobile device or hardware token).' },
+  { text: 'Two-Factor Authentication (2FA)', link: 'en/page-two-factor-authentication-(2fa)', description: 'An extra layer of security that requires users to provide two different authentication factors, typically something they know (password) and something they have (a mobile device or hardware token).' },
   { text: 'Rootkit', link: 'en/page-rootkit', description: 'A collection of malicious software that provides unauthorized access and control over a computer or network while hiding its presence from users and security software.' },
   { text: 'Port Scanning', link: 'en/page-port-scanning', description: 'The process of scanning a computer or network to identify open network ports and services, often used by attackers to find potential vulnerabilities.' },
   { text: 'Backdoor', link: 'en/page-backdoor', description: 'A hidden or undocumented means of accessing a computer system or network, often created for legitimate purposes but sometimes exploited by attackers.' },

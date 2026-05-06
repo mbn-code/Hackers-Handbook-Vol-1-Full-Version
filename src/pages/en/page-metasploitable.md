@@ -1,62 +1,84 @@
 ---
-title: Metasploit
-description: What is metasploit, what do we use it for and how can we use it. 
+title: Metasploitable VM Setup 
+description: A step-by-step guide to installing the ultimate hacking playground.
 layout: ../../layouts/MainLayout.astro
 ---
 
-This is a fully-featured page, written in Markdown!
+# Setting Up Your Hacking Target: Metasploitable 2 
 
-## Section A
+You can't learn how to hack by just reading a book,you have to get your hands dirty! However, hacking real servers on the internet is highly illegal. The solution? Build your own vulnerable server to practice on safely.
 
+**Metasploitable 2** is a Linux  [Virtual Machine](page-3) created by the Rapid7 team (the same people who make  [Metasploit](page-6)). It is intentionally riddled with severe security flaws, making it the perfect training ground to practice  [Port Scanning](page-port-scanning), exploiting, and gaining  [Root Access](page-root-access).
 
-This is for the tutorials and examples @ [metasploit](page-6).
+Follow this guide to get it running safely in VirtualBox.
 
-First download virtualbox if you haven't: https://www.virtualbox.org/wiki/Downloads
+---
 
-Go to the website here: https://information.rapid7.com/download-metasploitable-2017-thanks.html
+## Step 1: Download the Requirements
 
-Then you should see this website. 
+1. **VirtualBox:** If you haven't already, download and install [Oracle VirtualBox](https://www.virtualbox.org/wiki/Downloads).
+2. **Metasploitable Image:** Head over to the Rapid7 website to download the VM: [Download Metasploitable 2](https://information.rapid7.com/download-metasploitable-2017-thanks.html)
 
+*(You may need to fill out a short registration form to access the download link. Click the blue "DOWNLOAD METASPLOITABLE NOW" button).*
 
 ![Website download](/src/pages/en/images/Metasploitable-website.png)
 
-If you see this website, click on the blue button at the top of the page saying "DOWNLOAD METASPLOITABLE NOW"
+---
 
-![Thanks for reg](/src/pages/en/images/thanks-for-reg.png)
+## Step 2: Extract the Files 
 
-After the download is finished:
-
-Go to the location where your downloads save, and open the metasploitable-linux-2.0.0.zip (or rar) and extract the Metasploitable.vmdk (This is the file we are going to use to setup the VM on virtualbox).
+Once the download (`metasploitable-linux-2.0.0.zip`) is finished, locate it in your Downloads folder. 
+- Extract the ZIP file. 
+- Inside the extracted folder, look for a file named **`Metasploitable.vmdk`**. This is a Virtual Machine Disk file, which acts as the hard drive for our new VM.
 
 ![File in folder](/src/pages/en/images/metasploitable-linux%20file%20in%20folder.png)
 
-Now open Virtualbox
+---
 
-![Open VB](/src/pages/en/images/openVB.png)
+## Step 3: Create the Virtual Machine in VirtualBox 
 
-Click the button at the top that says "New"
+Now, open VirtualBox and follow these steps carefully:
 
-![New VM](/src/pages/en/images/ClickNewVM.png)
+1. Click the **"New"** button at the top of the VirtualBox interface.
+   ![New VM](/src/pages/en/images/ClickNewVM.png)
 
-Call it anything you want, - but it's smart to call it something like "metasploitable vm" if you have multiple VMs.
+2. **Name and Operating System:**
+  , **Name:** Enter `Metasploitable 2` (or anything you like).
+  , **Type:** Select `Linux`.
+  , **Version:** Select `Ubuntu (64-bit)` or `Ubuntu (32-bit)`.
+   ![Name and choosing](/src/pages/en/images/naming%20and%20choosing.png)
 
-![Name and choosing](/src/pages/en/images/naming%20and%20choosing.png)
+3. **Memory Size (RAM):**
+  , Allocate **1024 MB (1 GB)** of RAM. Metasploitable runs entirely via the  [Linux Shell](page-linux-shell) without a graphical user interface, so it requires very little computational power! Click "Next".
 
-Set the type to linux and version to Ubuntu
-Click "Next >"
+4. **Hard Disk:**
+  , This is the crucial step. Instead of creating a new hard disk, select **"Use an existing virtual hard disk file"**.
+  , Click the small yellow folder icon next to the dropdown menu.
+   ![Yellow Folder icon](/src/pages/en/images/yello%20Folder%20icon%20.png)
+  , Click **"Add"**, navigate to the folder where you extracted the download in Step 2, and select the **`Metasploitable.vmdk`** file.
+   ![Find mvdk file](/src/pages/en/images/FInd%20metasploitable.vmdk.png)
+  , Finally, click **"Create"**.
 
-You only need to allocate 1 gb ram because this is very light weight and is going to be ran as a virtual ubuntu server.
+---
 
-Press on the yellow folder icon (Mine is already selected as metasplkoitable.vmdk because I have already installed it before)
+## Step 4: Network Configuration  (CRITICAL)
 
-![Yellow Folder icon](/src/pages/en/images/yello%20Folder%20icon%20.png)
+Because Metasploitable is incredibly vulnerable, **you must ensure it is not exposed to the open internet!**
 
-After clicking on the yellow folder icon press on the add button, and find the metasploitable.vmdk
+1. Right-click your new `Metasploitable 2` VM in VirtualBox and select **Settings**.
+2. Go to the **Network** tab.
+3. Change the "Attached to" dropdown from "NAT" to **"Host-only Adapter"** (or "Internal Network"). 
+  , *This ensures the VM can only communicate with your host machine (like your Kali Linux VM) and cannot access the wider internet.*
 
-![Find mvdk file](/src/pages/en/images/FInd%20metasploitable.vmdk.png)
+---
 
-Then press on create
+## Step 5: Power On and Hack! 
 
-![Yellow Folder icon](/src/pages/en/images/yello%20Folder%20icon%20.png)
+You are done! Select the VM and click the green **Start** arrow.
 
-Now you are done, now you can start the machine and start hacking it. You don't need to up the ram or cpu cores because this is only running a Command line interface which does not need a lot of computational power.
+You will see lines of text scrolling by as the Linux server boots up. Eventually, it will prompt you for a login. 
+
+- **Username:** `msfadmin`
+- **Password:** `msfadmin`
+
+Once logged in, type `ip a` or `ifconfig` to find the machine's  [IP Address](page-ip). Now, switch over to your attacker machine (Kali Linux), fire up  [Nmap](page-4), and start finding those vulnerabilities! Happy hacking!

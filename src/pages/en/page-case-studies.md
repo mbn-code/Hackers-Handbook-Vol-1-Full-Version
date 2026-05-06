@@ -1,14 +1,14 @@
 ---
-title: Case Studies 📚
+title: Case Studies 
 description: Explore real-world case studies in the field of cybersecurity and ethical hacking.
 layout: ../../layouts/MainLayout.astro
 ---
 
-## Real-World Case Studies 🌐
+## Real-World Case Studies 
 
 In the world of cybersecurity and ethical hacking, real-world case studies provide invaluable insights and lessons. These case studies examine notable security incidents, breaches, and vulnerabilities, offering a deeper understanding of the ever-evolving threat landscape.
 
-## Learning from the Past 🔍
+## Learning from the Past 
 
 The examination of case studies serves several critical purposes:
 
@@ -18,7 +18,7 @@ The examination of case studies serves several critical purposes:
 
 - **Ethical Hacking Insights:** Case studies can inspire ethical hackers to refine their skills and methodologies. By learning from both successful and unsuccessful hacking attempts, ethical hackers can better protect their own systems.
 
-## Examples of Case Studies 📖
+## Examples of Case Studies 
 
 ### 1. The Equifax Data Breach
 
@@ -36,7 +36,7 @@ The Target data breach of 2013 is a classic example of a point-of-sale (POS) sys
 
 WannaCry was a widespread ransomware attack in 2017 that affected organizations worldwide. This case study uncovers the origins of WannaCry, its propagation, and the impact it had on cybersecurity practices.
 
-## Lessons and Takeaways 📝
+## Lessons and Takeaways 
 
 Real-world case studies are a valuable educational resource for cybersecurity professionals and ethical hackers. They highlight the need for continuous vigilance, proactive security measures, and the importance of responsible and ethical hacking practices.
 

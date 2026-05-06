@@ -13,7 +13,7 @@
   --accents-5: #333333;
   
   /* Typography */
-  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
+  --font-sans: 'Comic Sans MS', Arial, ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas;
   
   /* Spacing */
@@ -56,7 +56,9 @@ body {
   font-family: var(--font-sans);
   font-size: 1rem;
   font-size: clamp(0.9rem, 0.75rem + 0.375vw + var(--user-font-scale), 1rem);
-  line-height: 1.6;
+  line-height: 1.8;
+  letter-spacing: 0.05em;
+  word-spacing: 0.1em;
   max-width: 100vw;
   color: var(--foreground);
   background: var(--background);

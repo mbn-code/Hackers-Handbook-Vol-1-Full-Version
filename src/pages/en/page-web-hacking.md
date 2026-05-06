@@ -1,75 +1,43 @@
 ---
-title: Web Hacking 🔐
-description: Explore the world of web hacking, common attack techniques, and best practices for securing web applications.
+title: Web Hacking 
+description: An introduction to finding and exploiting vulnerabilities in web applications.
 layout: ../../layouts/MainLayout.astro
 ---
 
-## The World of Web Hacking 🌐
+# Web Application Hacking 
 
-Web hacking is the practice of identifying vulnerabilities and exploiting weaknesses in web applications, websites, and web services. It's an essential aspect of cybersecurity, as the web is a common target for attacks.
+As more companies move their infrastructure to the cloud, the web browser has become the primary way we interact with software. As a result, **Web Hacking** is currently one of the most lucrative and highly demanded skills in cybersecurity.
 
-## Why Web Hacking Matters 🕵️‍♂️
+Web hacking involves analyzing how a website communicates with its backend servers and manipulating that communication to make the application do things it wasn't designed to do. 
 
-Web hacking is of paramount importance for several reasons:
+The primary weapon of choice for web hackers is  [Burp Suite](page-burp-suite), a tool that intercepts web traffic before it reaches the server.
 
-- **Security Assessment:** It helps organizations identify and mitigate vulnerabilities in their web applications to prevent cyberattacks.
+## The OWASP Top 10 
 
-- **Threat Mitigation:** Understanding web hacking techniques allows for more effective defense against these threats.
+If you want to learn web hacking, you must start with the **OWASP Top 10**. The Open Web Application Security Project (OWASP) regularly publishes a list of the 10 most critical web application security risks. Here are a few heavy hitters:
 
-- **Data Protection:** Web hacking is crucial for safeguarding sensitive data stored and processed by web applications.
+### 1. Injection (SQLi, Command Injection)
+Injection flaws occur when untrusted user input is sent to an interpreter as part of a command or query. 
+-  [SQL Injection (SQLi)](page-sql-injection) is the most famous. If a website asks for your username, and you type a piece of database code instead, a vulnerable website might execute your code, dumping all its user passwords directly onto your screen!
 
-- **Compliance:** Many industries require compliance with security standards, making web hacking assessments a legal obligation.
+### 2. Broken Authentication
+If a website poorly implements session management or login functions, an attacker can compromise passwords, keys, or session tokens. This allows the attacker to assume the identity of other users.
 
-## Key Aspects of Web Hacking 🛠
+### 3. Cross-Site Scripting (XSS)
+XSS occurs when an application includes untrusted data in a web page without proper validation. 
+- **The Hack:** An attacker injects malicious JavaScript into a public forum post. When a normal user views the post, the script executes in their browser, potentially stealing their session cookies or redirecting them to a  [Phishing](page-5) site.
 
-Understanding web hacking involves grasping some key aspects:
+### 4. Broken Access Control
+This happens when users can act outside of their intended permissions. For example, if a normal user alters the URL from `website.com/user/profile` to `website.com/admin/dashboard` and the server allows them in, that's a massive access control failure!
 
-### Common Attack Techniques
+## Finding Web Vulnerabilities 
 
-Familiarize yourself with common attack techniques, such as SQL injection, Cross-Site Scripting (XSS), Cross-Site Request Forgery (CSRF), and more.
+1. **Reconnaissance:** Hackers use tools to map out every single page, directory, and input field on a target website. They look for hidden admin panels or old, forgotten subdomains.
+2. **Fuzzing:** Using  [Burp Suite Intruder](page-burp-suite), a hacker will send thousands of weird, unexpected characters (like `'`, `"`, `<script>`) to every input field to see if the server throws an error. An error often points to a vulnerability!
+3. **Source Code Review:** If the application is open-source, or if the hacker can read the frontend JavaScript, they will read the code line-by-line looking for logical flaws.
 
-### Vulnerability Scanning
+## Bug Bounty Programs 
 
-Use automated tools and manual techniques to scan web applications for vulnerabilities and weaknesses.
+One of the coolest things about web hacking is **Bug Bounties**. Companies like Google, Apple, and Facebook will legally pay ethical hackers thousands (sometimes hundreds of thousands) of dollars if they find and securely report a vulnerability in their web applications!
 
-### Ethical Hacking
-
-Conduct ethical hacking to identify vulnerabilities without causing harm and in a controlled environment.
-
-### Web Application Security
-
-Learn about best practices for securing web applications, such as input validation, authentication, and access control.
-
-### Reporting and Remediation
-
-Know how to report vulnerabilities and assist in the remediation process to fix security issues.
-
-## Web Hacking in Practice 🔐
-
-Web hacking is applied in various scenarios:
-
-- **Penetration Testing:** Ethical hackers use web hacking techniques to assess web application security.
-
-- **Bug Bounty Programs:** Many organizations offer bug bounty programs, encouraging ethical hackers to find and report vulnerabilities.
-
-- **Incident Response:** Security professionals use web hacking skills to investigate breaches and incidents involving web applications.
-
-- **Secure Development:** Web developers incorporate security best practices to prevent vulnerabilities in the first place.
-
-## Best Practices 📋
-
-For effective web hacking and securing web applications, consider these best practices:
-
-1. **Education:** Continuously educate yourself on web hacking techniques, vulnerabilities, and secure coding practices.
-
-2. **Use Safe Environments:** Conduct web hacking assessments in controlled, safe environments.
-
-3. **Ethical Approach:** Always follow ethical hacking guidelines and obtain proper authorization for testing.
-
-4. **Report Findings:** Responsibly report vulnerabilities to organizations and assist in the remediation process.
-
-5. **Keep Updated:** Stay informed about the latest web security threats and mitigation techniques.
-
-## Conclusion 🚀
-
-Web hacking is a vital discipline in cybersecurity, helping organizations identify and address vulnerabilities in web applications. By understanding common attack techniques and following best practices for ethical hacking and web application security, cybersecurity professionals contribute to a safer online environment.
+*Remember: Only test web applications you have explicit permission to hack, or those that are part of an official Bug Bounty program.*
