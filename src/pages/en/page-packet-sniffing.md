@@ -1,47 +1,75 @@
 ---
 title: Packet Sniffing
-description: The practice of intercepting and inspecting data packets as they travel over a network to capture information, often used for network troubleshooting but can be misused for unauthorized surveillance.
+description: How packet sniffers like Wireshark and tcpdump capture and inspect network traffic, why analysts rely on them, and how to defend against unauthorised sniffing.
 layout: ../../layouts/MainLayout.astro
 ---
 
-# Packet Sniffing
+Packet sniffing is the practice of capturing and inspecting the individual [packets](/en/page-packets) that carry data across a network. It is the workhorse of network troubleshooting, protocol analysis, and defensive monitoring, and in the wrong hands it becomes a quiet way to harvest credentials and secrets. On an authorised network you own or have permission to test, a sniffer is one of the most revealing tools you can run.
 
-Packet sniffing, also known as packet analysis or packet capture, is the practice of intercepting and inspecting data packets as they travel over a computer network. This technique is commonly used for network troubleshooting, monitoring, and analysis. However, it can also be misused for unauthorized surveillance and malicious purposes.
+## How a Sniffer Captures Traffic
 
-## How Packet Sniffing Works
+A network interface normally accepts only frames addressed to its own MAC address. Put the interface into **promiscuous mode** (and, on Wi-Fi, **monitor mode**) and it hands every frame it sees to the operating system, where a capture library like libpcap (Npcap on Windows) copies them for analysis.
 
-Packet sniffers work by capturing data packets that are transmitted over a network, including the data sent between devices and servers. These captured packets are then analyzed to gain insights into network traffic, identify network issues, and monitor network performance.
+What you can actually see depends on the link:
 
-### Common Uses of Packet Sniffing
+- On a **switched wired network**, a switch forwards unicast frames only to the destination port, so a passive sniffer sees mostly broadcast and its own traffic. Attackers widen their view with active tricks such as ARP spoofing or MAC flooding, which pull traffic through their machine.
+- On **Wi-Fi**, everyone shares the same radio medium. In monitor mode you can observe management and data frames from nearby devices, though modern WPA2/WPA3 encryption keeps the payloads unreadable without the key.
+- On a network you administer, a **SPAN/mirror port** or a physical network TAP feeds a copy of traffic to a dedicated analysis box cleanly and legitimately.
 
-1. **Network Troubleshooting:** Network administrators use packet sniffers to diagnose and resolve network problems, such as slow connections or connectivity issues. By analyzing packet data, they can pinpoint the source of the problem.
 
-2. **Network Security:** Security professionals use packet sniffing to detect and analyze security threats, such as intrusion attempts, unauthorized access, and suspicious network activity. It helps in identifying potential security breaches.
+<figure class="hh-figure">
+  <img src="/en/diagrams/mitm-sniffing.svg" alt="How an attacker in the middle can read unencrypted traffic." loading="lazy" />
+  <figcaption>How an attacker in the middle can read unencrypted traffic.</figcaption>
+</figure>
 
-3. **Performance Optimization:** Packet sniffing is useful for optimizing network performance. It allows organizations to monitor bandwidth usage and application performance, ensuring efficient network operation.
+## The Standard Tools
 
-### Risks and Misuse
+- **Wireshark** — the graphical reference tool. Its display filters and protocol dissectors turn raw bytes into readable HTTP requests, DNS queries, and TLS handshakes.
+- **tcpdump** — the ubiquitous command-line capturer, ideal on servers and over SSH.
+- **tshark** — Wireshark's terminal companion, useful for scripting and large captures.
 
-While packet sniffing has legitimate uses, it can also be misused for unauthorized surveillance and cyberattacks. When used maliciously, it can capture sensitive data, such as login credentials, personal information, and confidential communications. Hackers may deploy packet sniffers in a variety of ways, including:
+A typical capture-then-analyse workflow writes to a `.pcap` file for later inspection:
 
-- **Man-in-the-Middle Attacks:** Intercepting communication between two parties, potentially capturing sensitive data.
+```bash
+# Capture 500 packets on eth0 to a file, no reverse DNS lookups
+sudo tcpdump -i eth0 -c 500 -n -w capture.pcap
 
-- **Data Theft:** Capturing and stealing data for unauthorized use.
+# Only HTTP traffic on port 80
+sudo tcpdump -i eth0 -n 'tcp port 80'
 
-- **Eavesdropping:** Monitoring network traffic without consent to gather information.
+# Open the saved file in Wireshark for deep analysis
+wireshark capture.pcap
+```
 
-## Protecting Against Unauthorized Packet Sniffing
+Inside Wireshark, display filters narrow the noise fast:
 
-To protect against unauthorized packet sniffing, individuals and organizations can take several measures:
+```
+http.request.method == "POST"
+ip.addr == 192.168.1.10 && tcp.port == 443
+dns.qry.name contains "example"
+```
 
-1. **Encryption:** Encrypting network traffic ensures that even if packets are intercepted, the data remains secure and unreadable to unauthorized users.
+Reading capture output well means understanding the [networking](/en/page-networking) stack underneath it — [IP addresses](/en/page-ip), ports, and the TCP handshake all show up frame by frame.
 
-2. **Network Monitoring Tools:** Regularly monitor network traffic for any suspicious activity or signs of packet sniffing.
+## Legitimate Uses
 
-3. **Firewalls:** Implement firewalls to filter and block unauthorized access to the network.
+- **Troubleshooting:** pinpoint retransmissions, latency, and misconfigurations by watching the conversation instead of guessing.
+- **Defensive monitoring:** an intrusion detection system such as Snort or Suricata is a packet sniffer with rules, flagging exploit signatures and beaconing malware.
+- **Protocol and app debugging:** confirm exactly what a client and server send, including malformed requests and unexpected redirects.
+- **Security assessment:** during an authorised engagement, sniffing verifies whether sensitive data crosses the wire in the clear.
 
-4. **Regular Software Updates:** Keep network infrastructure and software up to date to patch known vulnerabilities that could be exploited by packet sniffers.
+## Why It Is Dangerous in the Wrong Hands
 
-5. **Network Segmentation:** Segregate sensitive data into isolated network segments to limit access.
+Any traffic sent without [encryption](/en/page-encryption) is fully readable to a sniffer on the path. Legacy plaintext protocols — HTTP, FTP, Telnet, and unauthenticated SMTP — expose usernames, passwords, and session tokens directly. Sniffing is also the payoff stage of a [man-in-the-middle](/en/page-web-hacking) attack: once an adversary reroutes traffic through their host, they capture and record everything that is not protected.
 
-In summary, packet sniffing is a valuable tool for network analysis and troubleshooting, but its potential for misuse underscores the importance of robust network security measures to protect against unauthorized interception of sensitive data.
+Running a sniffer against a network you do not own or have written permission to test is illegal in most jurisdictions. Keep your practice on your own lab, a [virtual machine](/en/page-3) setup, or a sanctioned range.
+
+## Defending Against Sniffing
+
+- **Encrypt everything in transit.** TLS (HTTPS), SSH, and a [VPN](/en/page-vpn) turn intercepted packets into unreadable ciphertext. Verify [certificates](/en/page-ssl-certificate) so an attacker cannot downgrade or impersonate the connection.
+- **Harden the switched layer.** Enable Dynamic ARP Inspection, DHCP snooping, and port security to blunt the ARP spoofing and MAC flooding that make sniffing possible on a LAN.
+- **Segment the network.** A [firewall](/en/page-firewall) and VLAN boundaries limit how far any single compromised host can listen.
+- **Retire plaintext protocols.** Replace Telnet with SSH and FTP with SFTP or HTTPS.
+- **Watch for the watchers.** Sudden ARP table changes, unexpected promiscuous interfaces, or a host answering for addresses that are not its own are signs someone is capturing traffic.
+
+Encryption is the decisive control: a sniffer can still grab the packets, but without the key the contents are noise.

@@ -1,46 +1,60 @@
 ---
-title: Host 
-description: What is a host in networking, and how do clients and servers interact?
+title: Host
+description: A host is any networked device with an IP address. Learn how hosts, clients, and servers interact, and why every assessment starts by finding live hosts.
 layout: ../../layouts/MainLayout.astro
 ---
 
-# What is a Host? 
+In [networking](/en/page-networking), a **host** is any device that has an [IP address](/en/page-ip) and can send or receive data across a network. Hosts are the endpoints that everything else — routers, switches, cables, protocols — exists to connect.
 
-In the realm of  [Networking](page-networking), the term **"host"** refers to any device that is connected to a network and has been assigned an  [IP Address](page-ip). 
+## What Counts as a Host
 
-A host is an endpoint. It can be the source of data, the destination for data, or both. If it has an IP address and can communicate with other devices, it's a host!
+A host is a communication endpoint: it can be the source of traffic, the destination, or both. If it holds an IP address and talks to other devices, it's a host. That covers a huge range of hardware:
 
-## Examples of Hosts
-Hosts come in all shapes and sizes. They include:
-- Your personal laptop or desktop computer.
-- Your smartphone connected to Wi-Fi.
-- A massive web server sitting in a data center.
-- A smart thermostat or internet-connected refrigerator ( [IoT Devices](page-wireless-iot)).
+- A laptop or desktop computer.
+- A smartphone on Wi-Fi or cellular.
+- A web, database, or mail server in a data center.
+- A smart thermostat, camera, or other [IoT device](/en/page-wireless-iot).
 - A network printer.
 
-*Note: Devices like network switches or unmanaged hubs are generally **not** considered hosts because they simply pass traffic along and usually do not have an IP address assigned to them for endpoint communication.*
+Pure layer-2 devices such as unmanaged switches and hubs forward frames without an IP address of their own, so they aren't endpoints in this sense. (A _managed_ switch with a management IP is a host on that management interface — the distinction is whether the device terminates traffic or just passes it along.)
 
-## Clients vs. Servers 
+## Clients and Servers
 
-While all endpoints are hosts, they usually fall into one of two distinct roles during communication:
+Every endpoint is a host, but during a given exchange a host plays one of two roles. These are roles, not fixed hardware types: the same machine can act as a client for one connection and a server for another.
 
-### 1. The Client (The Requester)
-A client is a host that requests a service or data from another host. 
-*Example:* When you open your web browser and type in a website URL, your laptop acts as the **client**. It sends a request out to the internet asking for a webpage.
+### The Client (the Requester)
 
-### 2. The Server (The Provider)
-A server is a powerful host designed to listen for requests from clients and provide them with services, data, or resources. 
-*Example:* The machine that holds the website files receives your laptop's request, packages up the HTML, and sends it back. It is acting as the **server**.
+A client initiates a request for a service, data, or a resource. When you type a URL into your browser, your laptop is the client — it opens a connection and asks a remote machine for a webpage.
 
-This model of communication is known as the **Client-Server Architecture**.
+### The Server (the Provider)
 
-## Hackers and Hosts 
+A server listens for incoming requests and responds with the requested resource. The machine holding the website receives your request, assembles the HTML, and sends it back. This request-response pattern is the **client-server model**, and it underpins the web, email, DNS, and most networked applications.
 
-When a hacker or penetration tester is planning an attack, they are almost always targeting a specific host (usually a server).
+Your own laptop straddles both roles constantly: it's a client when it loads a site, and a server the moment you run a local development server or accept an SSH connection.
 
-1. **Host Discovery:** The first step of a network attack is finding out which hosts are actually alive and connected to the network. Hackers use ping sweeps and  [Nmap](page-4) to discover active hosts.
-2. **Enumeration:** Once a host is found, the hacker performs  [Port Scanning](page-port-scanning) to figure out if the host is acting as a web server, a database server, or an email server.
-3. **Exploitation:** Finally, the hacker attempts to exploit a  [Vulnerability](page-vulnerability) on the host to gain unauthorized access (often aiming to get  [Root Access](page-root-access)).
-4. **Denial of Service:** Sometimes, instead of breaking into a host, a hacker just wants to knock it offline. They might launch a  [DDoS Attack](page-ddos-attack) by sending so much fake traffic to a server host that it crashes and can no longer serve legitimate clients.
+## Naming and Addressing Hosts
 
-Understanding the relationship between hosts, clients, and servers is fundamental to understanding how data flows,and how it can be intercepted or manipulated.
+Humans refer to hosts by **hostnames**; the network routes to them by IP address. DNS translates the former into the latter, while a local `hosts` file can override that lookup on a single machine. The special name `localhost` (see [localhost](/en/page-localhost)) always loops back to the machine you're on.
+
+```bash
+hostname            # print this machine's name
+hostname -I         # show its IP address(es) on Linux
+cat /etc/hosts      # local name-to-IP overrides
+```
+
+## Hosts in a Security Assessment
+
+During an **authorised** penetration test, the target is almost always a specific host — usually a server. Only ever run the steps below against systems you own or have explicit, written permission to test.
+
+1. **Host discovery.** Map which hosts are actually alive on a network before probing anything. A ping sweep with [Nmap](/en/page-4) does this quickly:
+
+   ```bash
+   # -sn performs host discovery only (no port scan) across a /24
+   nmap -sn 192.168.1.0/24
+   ```
+
+2. **Enumeration.** Once a live host is found, [port scanning](/en/page-port-scanning) reveals which services it runs — web, database, SSH, mail — and often their software versions.
+3. **Exploitation.** A tester then checks the exposed services against known weaknesses, attempting to leverage a [vulnerability](/en/page-vulnerability) to gain access, sometimes escalating to [root access](/en/page-root-access).
+4. **Availability attacks.** A [DDoS attack](/en/page-ddos-attack) targets a host without breaking in, flooding a server with traffic until it can no longer serve legitimate clients.
+
+Knowing how hosts, clients, and servers relate is fundamental to reading a network: it tells you where data originates, where it's headed, and where it can be observed, intercepted, or defended.

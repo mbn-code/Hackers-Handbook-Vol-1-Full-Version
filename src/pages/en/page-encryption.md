@@ -1,57 +1,80 @@
 ---
 title: Encryption
-description: The process of converting data into a code to prevent unauthorized access, providing data security and confidentiality.
+description: How encryption protects data with symmetric and asymmetric ciphers like AES and RSA, TLS in transit, encryption at rest, and post-quantum crypto.
 layout: ../../layouts/MainLayout.astro
 ---
 
-# Encryption
-
-Encryption is a fundamental process in the field of information security. It involves the transformation of data into a coded format to prevent unauthorized access. The primary goal of encryption is to ensure the security and confidentiality of data, making it inaccessible to anyone without the proper decryption key.
+Encryption turns readable data into scrambled ciphertext that only someone holding the right key can reverse. It is the workhorse of modern security, protecting everything from HTTPS traffic and disk contents to chat messages and password managers. Understanding it is essential for both attacking and defending systems, and it sits at the heart of applied [cryptography](/en/page-cryptography).
 
 ## How Encryption Works
 
-The encryption process involves using an algorithm and a key to convert plain, readable data (referred to as plaintext) into an unreadable, encoded form (ciphertext). The recipient who is intended to access the data possesses the decryption key, which is used to reverse the process and retrieve the original data.
+An encryption algorithm (a cipher) combines your **plaintext** with a **key** to produce **ciphertext**. Reversing the transformation to recover the plaintext is [decryption](/en/page-decryption), and it requires the correct key. The security of a good modern cipher rests entirely on the secrecy of the key, not the secrecy of the algorithm — a principle known as Kerckhoffs's principle. Public, heavily scrutinised algorithms like AES are trusted precisely _because_ everyone can inspect them.
 
-Key components of encryption include:
+Three components define any encryption scheme:
 
-- **Plaintext:** The original, unencrypted data that is to be protected.
+- **Algorithm:** The mathematical procedure. Use standard, peer-reviewed ciphers (AES, ChaCha20, RSA, ECC). Never roll your own crypto.
+- **Key:** The secret that unlocks the data. Key length and randomness matter — AES-256 uses a 256-bit key; RSA needs 3072-bit keys or larger for comparable strength.
+- **Mode / construction:** How the cipher processes data. Block ciphers like AES need an authenticated mode such as GCM to guarantee both confidentiality and integrity. Avoid ECB mode — it leaks patterns in the plaintext.
 
-- **Encryption Algorithm:** A set of rules and procedures that define how the plaintext is transformed into ciphertext. Different algorithms provide varying levels of security.
 
-- **Encryption Key:** This is a vital component. The encryption key is used in conjunction with the encryption algorithm to perform the encryption process. It's crucial to safeguard the encryption key, as it is needed to decrypt the data.
+<figure class="hh-figure">
+  <img src="/en/diagrams/symmetric-asymmetric.svg" alt="Symmetric vs. asymmetric encryption at a glance." loading="lazy" />
+  <figcaption>Symmetric vs. asymmetric encryption at a glance.</figcaption>
+</figure>
 
-## Use Cases for Encryption
+## Symmetric vs. Asymmetric Encryption
 
-Encryption is utilized in various scenarios to secure data and communication, including:
+The two families solve different problems, and real systems usually combine them.
 
-- **Secure Communication:** Encryption is widely used in email services, messaging apps, and secure websites to protect the confidentiality of messages and data in transit.
+### Symmetric Encryption
 
-- **Data Storage:** Encrypted data storage ensures that even if physical storage devices are compromised, the data remains protected.
+The same key encrypts and decrypts. It is fast and ideal for bulk data, but both parties must already share the key over a secure channel.
 
-- **Online Transactions:** E-commerce and online banking transactions rely on encryption to safeguard financial information.
+- **AES (Advanced Encryption Standard):** The default for files, disks, and databases. AES-256-GCM is a common, strong choice.
+- **ChaCha20-Poly1305:** A fast stream cipher favoured on mobile and platforms without AES hardware acceleration.
 
-- **Password Protection:** User passwords stored in databases are often encrypted to prevent unauthorized access to user accounts.
+### Asymmetric Encryption
 
-- **Confidential Files:** Sensitive documents and files are often encrypted to ensure only authorized individuals can access the content.
+A mathematically linked key pair: a **public key** anyone can use to encrypt (or verify a signature) and a **private key** the owner keeps secret to decrypt (or sign). This solves key distribution without a pre-shared secret.
 
-## Types of Encryption
+- **RSA:** Long-established, based on the difficulty of factoring large numbers.
+- **Elliptic Curve Cryptography (ECC):** Achieves the same security as RSA with far smaller keys and less computation, so it dominates modern TLS and messaging.
 
-There are various types of encryption, including:
+In practice, protocols like TLS use asymmetric crypto once — to authenticate the server and negotiate a shared session key — then switch to fast symmetric encryption for the rest of the conversation.
 
-- **Symmetric Encryption:** In symmetric encryption, the same key is used for both encryption and decryption. It's efficient but requires a secure method for key exchange.
+## Encryption in Transit vs. at Rest
 
-- **Asymmetric Encryption:** Asymmetric encryption uses a pair of keys, a public key for encryption and a private key for decryption. It's widely used for secure communication.
+- **In transit:** Data moving across a network. TLS 1.3 protects HTTPS, and secure messaging apps add end-to-end encryption so not even the provider can read messages. A [VPN](/en/page-vpn) wraps traffic in an encrypted tunnel. Behind HTTPS sits a validated [SSL/TLS certificate](/en/page-ssl-certificate).
+- **At rest:** Stored data. Full-disk encryption (LUKS, BitLocker, FileVault) protects laptops if they are lost or stolen; database and object-storage encryption protect data on servers and in the cloud.
 
-- **End-to-End Encryption:** This ensures that data is encrypted on the sender's device and only decrypted on the recipient's device, providing high security.
+```bash
+# Encrypt a file with AES-256 using OpenSSL (PBKDF2 derives the key from a passphrase)
+openssl enc -aes-256-cbc -pbkdf2 -salt -in secret.txt -out secret.enc
 
-## Benefits of Encryption
+# Decrypt it again
+openssl enc -d -aes-256-cbc -pbkdf2 -in secret.enc -out secret.txt
 
-The advantages of encryption include:
+# Asymmetric encryption/signing with GPG
+gpg --encrypt --recipient alice@example.com report.pdf
+```
 
-- **Data Security:** Encryption protects data from unauthorized access, ensuring its confidentiality.
+## Encryption Is Not Hashing
 
-- **Compliance:** Many regulations and standards require the encryption of sensitive data.
+A frequent and dangerous confusion: passwords should **not** be encrypted. Encryption is reversible by design, so anyone with the key can recover the plaintext. Passwords should be **hashed** with a slow, salted function built for the job — Argon2id, bcrypt, or scrypt — which is a one-way transformation. See [secure passwords](/en/page-secure-passwords) for how to store credentials correctly rather than reversibly encrypting them.
 
-- **Privacy:** Encryption safeguards personal and sensitive information, preserving individuals' privacy.
+Reserve encryption for data you legitimately need to read back later; use hashing when you only need to verify a value.
 
-In summary, encryption is a critical aspect of data security and privacy. It transforms data into a secure, unreadable format, preventing unauthorized access. Encryption is a fundamental tool in ensuring the confidentiality and integrity of data in various applications.
+## Common Pitfalls
+
+Strong ciphers fail when the surrounding implementation is weak. Watch for:
+
+- **Bad key management.** A hardcoded key in source code or a key stored next to the ciphertext defeats the whole scheme.
+- **Weak or reused randomness.** Nonces and initialisation vectors must be unpredictable and never reused with the same key.
+- **Deprecated primitives.** MD5 and SHA-1 are broken for security use; SSL and TLS below 1.2 are obsolete. Prefer TLS 1.3.
+- **No integrity check.** Encryption without authentication lets attackers tamper with ciphertext. Use authenticated encryption (AEAD) modes like GCM.
+
+## Looking Ahead: Post-Quantum Cryptography
+
+A sufficiently large quantum computer would break RSA and ECC by solving the hard math they rely on. In response, NIST standardised the first post-quantum algorithms in 2024 — ML-KEM (FIPS 203) for key exchange and ML-DSA (FIPS 204) for signatures. Major platforms and browsers have already begun deploying hybrid schemes that pair a classical key exchange with a post-quantum one, guarding against "harvest now, decrypt later" attacks where adversaries store encrypted traffic today to crack in the future.
+
+Encryption is powerful, but only when the algorithm, keys, and implementation are all sound — a single weak link undoes the rest.

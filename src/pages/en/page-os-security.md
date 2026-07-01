@@ -1,75 +1,202 @@
 ---
-title: Operating System Security 
-description: Explore the crucial aspects of securing operating systems, protecting against vulnerabilities, and ensuring a safe digital environment.
+title: Operating System Security
+description: "Harden Linux, Windows, and macOS: patching, least privilege, SELinux/AppArmor, logging, and disk encryption to shrink your attack surface."
 layout: ../../layouts/MainLayout.astro
 ---
 
-## The World of Operating System Security 
+The operating system sits between every application and the hardware, which makes it the most valuable target on any machine. Compromise the OS and you own the kernel, the memory, the disk, and every account on it. Hardening the OS is how you make that compromise expensive, noisy, and hard to sustain.
 
-Operating system (OS) security involves safeguarding the core software that manages a computer's hardware and software resources. It's a critical component of overall cybersecurity and plays a key role in protecting data and systems.
+This page is written for defenders and for testers with authorisation. Everything below applies to systems you own or are explicitly permitted to assess.
 
-## Why Operating System Security Matters 
+## The Attack Surface You Are Defending
 
-Operating system security is of paramount importance for several reasons:
+Every running service, listening port, installed package, and privileged account is a door an attacker can try. Effective OS security is mostly about reducing the number of doors and putting a lock and an alarm on the ones that must stay open.
 
-- **System Integrity:** It ensures that the OS functions correctly and is protected from tampering or unauthorized modifications.
+Think in layers:
 
-- **Data Protection:** Securing the OS is essential for protecting sensitive data stored and processed by the system.
+- **Identity and access:** who can log in, and as whom.
+- **Privilege:** what an authenticated user is allowed to do.
+- **Exposure:** which services and ports are reachable, and from where.
+- **Integrity:** whether the running system still matches what you deployed.
+- **Visibility:** whether you would notice an intrusion in time to respond.
 
-- **Application Security:** Many applications rely on the security of the underlying OS. A compromised OS can lead to vulnerabilities in applications.
+A weakness in any one layer can undo the others, so treat them as a set rather than a checklist to cherry-pick from. If you are still getting comfortable with how operating systems work under the hood, start with [Getting Cozy with Operating Systems](/en/page-2).
 
-- **Defense Against Attacks:** The OS serves as the first line of defense against various cyberattacks, including malware, exploits, and unauthorized access.
+## Patch Management: Close Known Doors First
 
-## Key Aspects of Operating System Security 
+The overwhelming majority of real intrusions exploit a [vulnerability](/en/page-vulnerability) that already had a fix available. Unpatched software is the single most common way in, which makes timely patching the highest-value control you have.
 
-Understanding OS security involves grasping some key aspects:
+On Debian and Ubuntu systems, update through the [apt package manager](/en/page-apt-package-manager):
 
-### User Access Control
+```bash
+sudo apt update && sudo apt upgrade -y
+# Automate security updates
+sudo apt install unattended-upgrades
+sudo dpkg-reconfigure --priority=low unattended-upgrades
+```
 
-User access control mechanisms, like user accounts and permissions, regulate who can access the system and what actions they can perform.
+On Red Hat, Fedora, and derivatives:
 
-### Patch Management
+```bash
+sudo dnf upgrade --refresh
+```
 
-Keeping the OS up-to-date with security patches is crucial for addressing known vulnerabilities.
+On Windows, keep automatic updates enabled and confirm the last successful install:
 
-### Auditing and Monitoring
+```powershell
+Get-HotFix | Sort-Object InstalledOn -Descending | Select-Object -First 10
+```
 
-Logging and monitoring help detect and respond to security incidents and suspicious activities.
+Track what you have deployed so you can answer "are we affected?" the day a critical CVE drops, rather than guessing. Automate where you can; a patch that ships next quarter is not a control.
 
-### Security Policies
+## Access Control and Least Privilege
 
-Defining and enforcing security policies ensures that the OS complies with security standards and practices.
+Grant every account the minimum rights it needs and nothing more. Most damage from a breach comes from privilege the compromised account never actually needed.
 
-### Configuration Hardening
+Do routine work as an unprivileged user and escalate deliberately with `sudo` instead of logging in as root. If you need a refresher on how the shell and permissions fit together, see [The Linux Shell](/en/page-linux-shell) and [Root Access](/en/page-root-access).
 
-System hardening involves configuring the OS to minimize security risks and reduce the attack surface.
+```bash
+# Create a standard user and grant controlled admin rights
+sudo useradd -m -s /bin/bash analyst
+sudo passwd analyst
+sudo usermod -aG sudo analyst      # 'wheel' on RHEL-family systems
 
-## Operating System Security in Practice 
+# Inspect file permissions and ownership
+ls -l /etc/shadow                  # should be root-owned, not world-readable
+```
 
-OS security is applied in various scenarios:
+Harden authentication itself:
 
-- **Endpoint Security:** Securing end-user devices, such as desktops and laptops, involves OS hardening, antivirus, and endpoint protection.
+- Enforce strong, unique credentials. See [Secure Passwords](/en/page-secure-passwords).
+- Require [Two-Factor Authentication](</en/page-two-factor-authentication-(2fa)>) for administrative and remote access.
+- For SSH, disable password login and root login, and use key-based authentication:
 
-- **Server Security:** Server operating systems are hardened and monitored to protect sensitive data and applications.
+```bash
+# /etc/ssh/sshd_config
+PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+```
 
-- **Mobile Devices:** Mobile OS security is crucial for protecting personal and business information on smartphones and tablets.
+Apply the least-privilege principle to services too: run daemons under dedicated low-privilege accounts so a bug in one service cannot immediately become full system control.
 
-- **Virtual Environments:** Virtual machine OS security ensures the integrity and isolation of virtualized workloads.
+## Mandatory Access Control and Kernel Hardening
 
-## Best Practices 
+File permissions alone are discretionary; a process running as root can ignore them. Mandatory Access Control (MAC) adds a policy the kernel enforces regardless of user, confining each program to the resources it is supposed to touch. When an exploited web server is boxed in by SELinux or AppArmor, the attacker's foothold is far smaller.
 
-For effective OS security, consider these best practices:
+```bash
+# SELinux (RHEL, Fedora) — confirm it is enforcing
+getenforce
+sudo setenforce 1
 
-1. **Regular Patching:** Keep the OS up-to-date with security patches to address known vulnerabilities.
+# AppArmor (Ubuntu, Debian, SUSE) — list active profiles
+sudo aa-status
+```
 
-2. **Access Control:** Implement strong user access control policies and principles of least privilege.
+Tighten kernel behaviour with `sysctl` to blunt common exploitation techniques:
 
-3. **Monitoring and Logging:** Set up monitoring and logging to detect and respond to security incidents.
+```bash
+# Restrict access to kernel pointers and dmesg
+sudo sysctl kernel.kptr_restrict=2
+sudo sysctl kernel.dmesg_restrict=1
+```
 
-4. **Backup and Recovery:** Regularly back up critical data and systems for disaster recovery.
+These controls do not stop the initial bug, but they turn "instant total compromise" into "contained, detectable incident."
 
-5. **Education and Training:** Ensure that users and administrators are educated about security practices and policies.
+## Configuration Hardening and Reducing Exposure
 
-## Conclusion 
+Disable and remove what you do not use. Every service you turn off is one fewer thing to patch, monitor, and worry about.
 
-Operating system security is a fundamental element in the world of cybersecurity. It encompasses a range of practices and measures to protect the OS from threats and vulnerabilities. By following best practices and maintaining a proactive approach to security, organizations and individuals can create a safe digital environment.
+```bash
+# See what is listening on the network
+sudo ss -tulpn
+
+# Stop and disable an unneeded service
+sudo systemctl disable --now cups
+```
+
+Put a host [firewall](/en/page-firewall) in front of whatever must stay reachable, defaulting to deny:
+
+```bash
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow 22/tcp        # only the ports you actually serve
+sudo ufw enable
+```
+
+Encrypt data at rest so a stolen laptop or decommissioned drive does not become a data breach: LUKS on Linux, BitLocker on Windows, FileVault on macOS. Where the hardware supports it, enable Secure Boot so the system refuses to load an unsigned or tampered boot chain, one of the footholds a [rootkit](/en/page-rootkit) relies on. Follow published baselines such as the CIS Benchmarks rather than hardening from memory.
+
+## Auditing, Logging, and Integrity Monitoring
+
+You cannot respond to what you cannot see. Centralised, tamper-resistant logs are what separate a quick containment from a breach that dwells for months.
+
+```bash
+# Follow authentication events in real time
+sudo journalctl -u ssh -f
+
+# Record security-relevant syscalls with the audit daemon
+sudo systemctl enable --now auditd
+sudo ausearch -m avc -ts recent      # recent SELinux denials
+```
+
+Add file integrity monitoring (AIDE, Tripwire, or an EDR agent) so unexpected changes to system binaries and configuration raise an alert. Ship logs off the host to a system the local admin account cannot edit; the first thing an intruder does is try to erase their tracks. When something does trip an alarm, your [incident response](/en/page-incident-response) plan and [forensics](/en/page-forensics) practices decide how well it ends.
+
+## Hands-on Lab: Harden a Fresh VM and Prove It
+
+Do this on a disposable Ubuntu Server VM you own. If you need one, follow [Virtual Machines -> Setting One Up](/en/page-3), then take a snapshot so you can roll back and repeat the lab from scratch.
+
+1. **Measure the starting attack surface.** Before changing anything, record what is exposed so you have something to compare against:
+
+```bash
+sudo ss -tulpn > ~/baseline-ports.txt
+systemctl list-units --type=service --state=running | tee ~/baseline-services.txt
+```
+
+2. **Patch, then lock down SSH.** Apply updates, edit `/etc/ssh/sshd_config` to set `PermitRootLogin no` and `PasswordAuthentication no`, then reload the daemon:
+
+```bash
+sudo apt update && sudo apt full-upgrade -y
+sudo systemctl reload ssh
+```
+
+3. **Default-deny the firewall,** allowing only the port you actually serve:
+
+```bash
+sudo ufw default deny incoming
+sudo ufw allow 22/tcp
+sudo ufw enable
+```
+
+4. **Confirm enforcement and auditing are live:**
+
+```bash
+sudo aa-status | head
+sudo systemctl enable --now auditd
+```
+
+5. **Prove the controls work.** From a second VM on the same host-only network, scan the target with [Nmap](/en/page-4) and compare the result against your baseline — every port you did not open should now show as filtered:
+
+```bash
+nmap -sV <target-ip>
+```
+
+6. **Watch the logs react.** Back on the target, follow authentication events, then trigger a failed SSH login from the second box:
+
+```bash
+sudo journalctl -u ssh -f
+```
+
+The rejected attempt should appear in real time. Finally, diff `ss -tulpn` against `baseline-ports.txt`: every entry that disappeared is a door you closed. Revert to the snapshot and try the steps in a different order to build intuition for what each control actually buys you.
+
+## A Practical Baseline
+
+For any system you are responsible for, get these in place before anything fancier:
+
+1. **Patch on a schedule** and automate security updates.
+2. **Enforce least privilege** — no daily use of root or Administrator, and MFA on remote access.
+3. **Minimise exposure** — disable unused services, default-deny the firewall, encrypt disks.
+4. **Enable MAC and kernel hardening** so a single bug does not mean full compromise.
+5. **Log centrally and monitor integrity** so you detect intrusions early.
+6. **Back up and test restores** — recovery is a security control, not just an IT chore.
+
+Hardening is not a one-time project. Systems drift, new services get added, and fresh vulnerabilities appear weekly, so treat OS security as a habit you maintain rather than a box you tick. Pair it with secure application development, covered in [Secure Coding](/en/page-secure-coding), to protect the full stack.
