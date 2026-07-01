@@ -2,7 +2,8 @@
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
     "target": "ES2017",
-    "jsx": "preserve",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "skipLibCheck": true
   }
 }

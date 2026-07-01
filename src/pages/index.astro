@@ -1,5 +1,522 @@
-<script is:inline>
-	// Redirect your homepage to the first page of documentation.
-	// If you have a landing page, remove this script and add it here!
-	window.location.pathname = `/en/introduction`;
-</script>
+---
+import HeadCommon from '../components/HeadCommon.astro';
+import HeadSEO from '../components/HeadSEO.astro';
+import AstroLogo from '../components/Header/AstroLogo.astro';
+import ThemeToggleButton from '../components/RightSidebar/ThemeToggleButton';
+import Icon from '../components/Icon.astro';
+import * as CONFIG from '../config';
+
+const canonicalURL = new URL('/', Astro.site);
+const groups = CONFIG.SIDEBAR.en;
+
+// The handbook's structure, rendered straight from the sidebar config so the
+// landing "contents" can never drift from the actual navigation.
+const parts = [
+	{ key: 'Getting Started', kicker: 'Start here', icon: 'compass' },
+	{ key: 'Fundamentals', kicker: 'Part 01', icon: 'cpu' },
+	{ key: 'Tools & Techniques', kicker: 'Part 02', icon: 'wrench' },
+	{ key: 'Advanced Topics', kicker: 'Part 03', icon: 'layers' },
+	{ key: 'Glossary', kicker: 'Reference', icon: 'list' },
+] as const;
+
+const totalChapters = Object.values(groups).reduce((n, c) => n + c.length, 0);
+const year = new Date().getFullYear();
+---
+
+<html lang="en" class="initial">
+	<head>
+		<HeadCommon />
+		<HeadSEO
+			frontmatter={{
+				title: 'A field guide to ethical hacking',
+				description: CONFIG.SITE.description,
+				layout: '',
+			}}
+			canonicalUrl={canonicalURL}
+		/>
+		<title>{CONFIG.SITE.title} — A Field Guide to Ethical Hacking</title>
+	</head>
+	<body>
+		<header class="site-header">
+			<a class="brand" href="/">
+				<AstroLogo size={30} />
+				<span class="brand-name">Hackers Handbook <span class="brand-vol">Vol.&nbsp;1</span></span>
+			</a>
+			<nav class="header-nav">
+				<a href="/en/introduction">Handbook</a>
+				<a href={CONFIG.GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" class="nav-icon" aria-label="GitHub repository">
+					<Icon name="github" size={19} />
+				</a>
+				<ThemeToggleButton client:visible />
+			</nav>
+		</header>
+
+		<main>
+			<section class="hero">
+				<div class="hero-copy">
+					<p class="kicker"><Icon name="terminal" size={15} /> A field guide to ethical hacking</p>
+					<h1>Learn to think<br /> like a hacker.</h1>
+					<p class="lead">
+						A free, practical handbook that walks you from first principles to real
+						penetration-testing tools — written for people who learn by doing, and built to
+						double as a cheat sheet you'll come back to.
+					</p>
+					<div class="cta-row">
+						<a class="btn-primary" href="/en/introduction">
+							Start reading <Icon name="arrow-right" size={17} />
+						</a>
+						<a class="btn-secondary" href="#contents">Browse the contents</a>
+					</div>
+					<dl class="stats">
+						<div><dt>{totalChapters}</dt><dd>chapters</dd></div>
+						<div><dt>{parts.length}</dt><dd>sections</dd></div>
+						<div><dt>Free</dt><dd>&amp; open source</dd></div>
+					</dl>
+				</div>
+
+				<figure class="code-card" aria-hidden="true">
+					<figcaption>
+						<Icon name="terminal" size={14} />
+						<span>recon.sh</span>
+					</figcaption>
+					<pre><code><span class="c-dim"># fingerprint the target's open services</span>
+<span class="c-prompt">$</span> nmap <span class="c-flag">-sV</span> 10.0.0.5
+<span class="c-dim">PORT     STATE  SERVICE   VERSION</span>
+<span class="c-dim">22/tcp   open   ssh       OpenSSH 8.9</span>
+<span class="c-dim">80/tcp   open   http      nginx 1.24</span>
+
+<span class="c-prompt">$</span> msfconsole <span class="c-flag">-q</span>
+<span class="c-prompt">msf6 ></span> use exploit/multi/handler
+<span class="c-prompt">msf6 ></span> <span class="c-ok">run</span>
+<span class="c-ok">[*] Meterpreter session 1 opened</span></code></pre>
+				</figure>
+			</section>
+
+			<section id="contents" class="contents">
+				<div class="section-head">
+					<p class="kicker"><Icon name="book-open" size={15} /> Inside the handbook</p>
+					<h2>Everything, in order.</h2>
+					<p class="section-sub">
+						Read it cover to cover, or jump straight to what you need. Each chapter is
+						self-contained and hands-on.
+					</p>
+				</div>
+
+				<ol class="parts">
+					{
+						parts.map((part) => (
+							<li class="part">
+								<div class="part-head">
+									<span class="part-icon"><Icon name={part.icon} size={20} /></span>
+									<div>
+										<span class="part-kicker">{part.kicker}</span>
+										<h3>{part.key}</h3>
+									</div>
+									<span class="part-count">{groups[part.key].length}</span>
+								</div>
+								<ul class="chapters">
+									{groups[part.key].map((chapter) => (
+										<li>
+											<a href={'/' + chapter.link}>
+												<span>{chapter.text}</span>
+												<Icon name="arrow-right" size={14} class="chapter-arrow" />
+											</a>
+										</li>
+									))}
+								</ul>
+							</li>
+						))
+					}
+				</ol>
+			</section>
+
+			<aside class="disclaimer" role="note">
+				<Icon name="alert-triangle" size={20} />
+				<p>
+					<strong>For education and authorised testing only.</strong> Everything here is meant for
+					learning and for systems you own or have explicit permission to test. Using these
+					techniques anywhere else is illegal — hack responsibly.
+				</p>
+			</aside>
+		</main>
+
+		<footer class="site-footer">
+			<div class="footer-inner">
+				<a class="brand" href="/">
+					<AstroLogo size={26} />
+					<span class="brand-name">Hackers Handbook Vol.&nbsp;1</span>
+				</a>
+				<nav class="footer-links">
+					<a href="/en/introduction">Handbook</a>
+					<a href={CONFIG.GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer">Source</a>
+					<a href={CONFIG.PATREON_URL} target="_blank" rel="noopener noreferrer">Patreon</a>
+				</nav>
+			</div>
+			<p class="colophon">© {year} · For educational use only · MIT Licensed</p>
+		</footer>
+	</body>
+</html>
+
+<style>
+	body {
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+	}
+
+	main {
+		flex: 1;
+		width: 100%;
+		max-width: 72rem;
+		margin: 0 auto;
+		padding: 0 1.5rem;
+	}
+
+	/* ---- Shared bits ------------------------------------------------ */
+	.kicker {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-family: var(--font-mono);
+		font-size: 0.78rem;
+		font-weight: 500;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--theme-text-accent);
+		margin: 0;
+	}
+
+	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6rem;
+		font-weight: 600;
+		font-size: 1rem;
+		color: var(--theme-text);
+		text-decoration: none;
+	}
+	.brand-vol {
+		color: var(--theme-text-lighter);
+		font-weight: 500;
+	}
+
+	/* ---- Header ----------------------------------------------------- */
+	.site-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		max-width: 72rem;
+		width: 100%;
+		margin: 0 auto;
+		padding: 1.15rem 1.5rem;
+	}
+	.header-nav {
+		display: flex;
+		align-items: center;
+		gap: 1.35rem;
+	}
+	.header-nav a {
+		color: var(--theme-text-light);
+		font-weight: 500;
+		font-size: 0.95rem;
+		text-decoration: none;
+	}
+	.header-nav a:hover {
+		color: var(--theme-text-accent);
+	}
+	.nav-icon {
+		display: inline-flex;
+	}
+
+	/* ---- Hero ------------------------------------------------------- */
+	.hero {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 3rem;
+		align-items: center;
+		padding: 3.5rem 0 4.5rem;
+	}
+	.hero h1 {
+		font-family: var(--font-display);
+		font-size: clamp(2.6rem, 1.9rem + 3.2vw, 4.1rem);
+		font-weight: 600;
+		line-height: 1.04;
+		letter-spacing: -0.02em;
+		margin: 1.25rem 0 1.25rem;
+		color: var(--theme-text);
+	}
+	.lead {
+		font-size: 1.12rem;
+		color: var(--theme-text-light);
+		max-width: 33rem;
+		line-height: 1.65;
+		margin: 0;
+	}
+	.cta-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.85rem;
+		margin-top: 2rem;
+	}
+	.stats {
+		display: flex;
+		gap: 2.5rem;
+		margin: 2.75rem 0 0;
+		padding-top: 1.75rem;
+		border-top: var(--hairline);
+	}
+	.stats div {
+		display: flex;
+		flex-direction: column;
+	}
+	.stats dt {
+		font-family: var(--font-display);
+		font-size: 1.7rem;
+		font-weight: 600;
+		color: var(--theme-text);
+		line-height: 1;
+	}
+	.stats dd {
+		margin: 0.35rem 0 0;
+		font-size: 0.82rem;
+		color: var(--theme-text-lighter);
+	}
+
+	/* ---- Code card -------------------------------------------------- */
+	.code-card {
+		margin: 0;
+		border: var(--hairline);
+		border-radius: var(--radius-lg);
+		overflow: hidden;
+		background: var(--theme-code-bg);
+		box-shadow: var(--theme-glow);
+	}
+	.code-card figcaption {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.7rem 1.1rem;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		color: #8b98a5;
+		background: rgba(255, 255, 255, 0.03);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+	}
+	.code-card pre {
+		margin: 0;
+		padding: 1.25rem 1.4rem;
+		background: transparent;
+		color: var(--theme-code-text);
+		font-family: var(--font-mono);
+		font-size: 0.83rem;
+		line-height: 1.75;
+		overflow-x: auto;
+	}
+	.code-card .c-prompt {
+		color: var(--brand-400);
+	}
+	.code-card .c-flag {
+		color: #7dd3fc;
+	}
+	.code-card .c-dim {
+		color: #6b7484;
+	}
+	.code-card .c-ok {
+		color: #86efac;
+	}
+
+	/* ---- Contents --------------------------------------------------- */
+	.contents {
+		padding: 2.5rem 0 3rem;
+		scroll-margin-top: 2rem;
+	}
+	.section-head {
+		max-width: 40rem;
+		margin-bottom: 2.5rem;
+	}
+	.section-head h2 {
+		font-family: var(--font-display);
+		font-size: clamp(1.8rem, 1.4rem + 1.4vw, 2.4rem);
+		font-weight: 600;
+		letter-spacing: -0.015em;
+		margin: 0.9rem 0 0.75rem;
+		color: var(--theme-text);
+	}
+	.section-sub {
+		font-size: 1.05rem;
+		color: var(--theme-text-light);
+		margin: 0;
+		line-height: 1.6;
+	}
+
+	.parts {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 1rem;
+	}
+	.part {
+		border: var(--hairline);
+		border-radius: var(--radius-lg);
+		background: var(--theme-bg-offset);
+		padding: 1.5rem 1.6rem;
+		transition: border-color 0.2s ease;
+	}
+	.part:hover {
+		border-color: var(--theme-divider);
+	}
+	.part-head {
+		display: flex;
+		align-items: center;
+		gap: 0.9rem;
+		padding-bottom: 1.1rem;
+		margin-bottom: 1.1rem;
+		border-bottom: var(--hairline);
+	}
+	.part-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		flex-shrink: 0;
+		border-radius: var(--radius-md);
+		background: var(--theme-bg-accent);
+		color: var(--theme-text-accent);
+	}
+	.part-kicker {
+		display: block;
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		font-weight: 500;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--theme-text-lighter);
+	}
+	.part-head h3 {
+		font-family: var(--font-display);
+		font-size: 1.35rem;
+		font-weight: 600;
+		margin: 0.1rem 0 0;
+		color: var(--theme-text);
+	}
+	.part-count {
+		margin-left: auto;
+		align-self: flex-start;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		color: var(--theme-text-lighter);
+		background: var(--theme-bg-hover);
+		border-radius: 999px;
+		padding: 0.15rem 0.6rem;
+	}
+	.chapters {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+		gap: 0.15rem 1.25rem;
+	}
+	.chapters a {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+		padding: 0.5rem 0.6rem;
+		margin: 0 -0.6rem;
+		border-radius: var(--radius-sm);
+		color: var(--theme-text-light);
+		font-weight: 500;
+		text-decoration: none;
+		transition: color 0.12s ease, background 0.12s ease;
+	}
+	.chapters a:hover {
+		color: var(--theme-text-accent);
+		background: var(--theme-bg-hover);
+	}
+	.chapter-arrow {
+		opacity: 0;
+		transform: translateX(-4px);
+		transition: opacity 0.12s ease, transform 0.12s ease;
+		color: var(--theme-text-accent);
+		flex-shrink: 0;
+	}
+	.chapters a:hover .chapter-arrow {
+		opacity: 1;
+		transform: translateX(0);
+	}
+
+	/* ---- Disclaimer ------------------------------------------------- */
+	.disclaimer {
+		display: flex;
+		gap: 0.9rem;
+		align-items: flex-start;
+		margin: 2rem 0 3.5rem;
+		padding: 1.2rem 1.4rem;
+		border: var(--hairline);
+		border-left: 3px solid #d99a1c;
+		border-radius: var(--radius-md);
+		background: var(--theme-bg-offset);
+	}
+	.disclaimer > :global(svg) {
+		color: #d99a1c;
+		flex-shrink: 0;
+		margin-top: 0.15rem;
+	}
+	.disclaimer p {
+		margin: 0;
+		color: var(--theme-text-light);
+		line-height: 1.6;
+		font-size: 0.96rem;
+	}
+	.disclaimer strong {
+		color: var(--theme-text);
+	}
+
+	/* ---- Footer ----------------------------------------------------- */
+	.site-footer {
+		border-top: var(--hairline);
+		padding: 2.25rem 1.5rem;
+	}
+	.footer-inner {
+		max-width: 72rem;
+		margin: 0 auto;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+	.footer-links {
+		display: flex;
+		gap: 1.5rem;
+	}
+	.footer-links a {
+		color: var(--theme-text-light);
+		font-weight: 500;
+		text-decoration: none;
+	}
+	.footer-links a:hover {
+		color: var(--theme-text-accent);
+	}
+	.colophon {
+		max-width: 72rem;
+		margin: 1.5rem auto 0;
+		font-size: 0.83rem;
+		color: var(--theme-text-lighter);
+	}
+
+	@media (min-width: 60em) {
+		.hero {
+			grid-template-columns: 1.05fr 0.95fr;
+		}
+	}
+	@media (max-width: 40em) {
+		.stats {
+			gap: 1.75rem;
+		}
+	}
+</style>

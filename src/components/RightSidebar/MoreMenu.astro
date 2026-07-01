@@ -1,5 +1,6 @@
 ---
 import ThemeToggleButton from './ThemeToggleButton';
+import Icon from '../Icon.astro';
 import * as CONFIG from '../../config';
 
 type Props = {
@@ -7,45 +8,55 @@ type Props = {
 };
 
 const { editHref } = Astro.props as Props;
-const showMoreSection = CONFIG.COMMUNITY_INVITE_URL;
+
+const links = [
+	{ href: editHref, icon: 'pencil', label: 'Edit this page' },
+	{ href: CONFIG.GITHUB_REPO_URL, icon: 'github', label: 'Star on GitHub' },
+	{ href: CONFIG.PATREON_URL, icon: 'heart', label: 'Support on Patreon' },
+] as const;
 ---
 
-{showMoreSection && <h2 class="heading">More</h2>}
+<h2 class="heading">More</h2>
 <ul>
-	{CONFIG.COMMUNITY_INVITE_URL && (
-		<li class={`heading-link depth-2`}>
-			<a href={CONFIG.COMMUNITY_INVITE_URL} target="_blank">
-				<svg
-					aria-hidden="true"
-					focusable="false"
-					data-prefix="fas"
-					data-icon="comment-alt"
-					class="svg-inline--fa fa-comment-alt fa-w-16"
-					role="img"
-					xmlns="http://www.w3.org/2000/svg"
-					viewBox="0 0 512 512"
-					height="1em"
-					width="1em"
-					>
-					<path
-						fill="currentColor"
-						d="M448 0H64C28.7 0 0 28.7 0 64v288c0 35.3 28.7 64 64 64h96v84c0 9.8 11.2 15.5 19.1 9.7L304 416h144c35.3 0 64-28.7 64-64V64c0-35.3-28.7-64-64-64z"
-					/>
-				</svg>
-				<span>Join our community</span>
-			</a>
-		</li>
-	)}
+	{
+		links.map((l) => (
+			<li class="heading-link depth-2">
+				<a href={l.href} target="_blank" rel="noopener noreferrer">
+					<Icon name={l.icon} size={16} />
+					<span>{l.label}</span>
+				</a>
+			</li>
+		))
+	}
 </ul>
-<div style="margin: 2rem 0; text-align: center;">
+<div class="theme-toggle-wrap">
+	<span class="toggle-label">Theme</span>
 	<ThemeToggleButton client:visible />
 </div>
 
 <style>
-	.edit-on-github {
-		text-decoration: none;
-		font: inherit;
-		color: inherit;
-		font-size: 1rem;
+	.heading-link a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6em;
+	}
+	.heading-link :global(svg) {
+		flex-shrink: 0;
+	}
+	.theme-toggle-wrap {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		margin: 2rem 0 0;
+		padding: 0 0.75rem;
+	}
+	.toggle-label {
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--theme-text-lighter);
 	}
 </style>

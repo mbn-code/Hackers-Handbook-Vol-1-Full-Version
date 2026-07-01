@@ -1,55 +1,145 @@
+/*
+ * Design system for Hackers Handbook Vol. 1
+ * ------------------------------------------
+ * Single source of truth for colour, typography and elevation tokens.
+ * Light theme lives on :root, dark theme on :root.theme-dark (toggled by the
+ * ThemeToggleButton + the inline no-FOUC script in HeadCommon.astro).
+ *
+ * Every --theme-* / --color-* token referenced by a component is defined here,
+ * so the whole UI (hover states, active-nav highlight, dividers, code blocks,
+ * accents) resolves consistently instead of silently falling back to `initial`.
+ */
+
 :root {
-  /* Font system */
-  --font-fallback: 'Comic Sans MS', Arial, sans-serif;
-  --font-body: system-ui, var(--font-fallback);
-  --font-mono: 'IBM Plex Mono', Consolas, 'Andale Mono WT', monospace;
+  color-scheme: light;
 
-  /* Modern color tokens */
-  --neutral-50: #fdfdf5;
-  --neutral-100: #f5f5f0;
-  --neutral-200: #e5e5e5;
-  --neutral-300: #d4d4d4;
-  --neutral-400: #a3a3a3;
-  --neutral-500: #737373;
-  --neutral-600: #525252;
-  --neutral-700: #404040;
-  --neutral-800: #262626;
-  --neutral-900: #2c2c2c;
-  
-  --primary-50: #eef2ff;
-  --primary-100: #e0e7ff;
-  --primary-500: #6366f1;
-  --primary-600: #4f46e5;
-  --primary-700: #4338ca;
+  /* ---- Typography (IBM Plex superfamily) --------------------------- */
+  --font-fallback:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-sans: "IBM Plex Sans", var(--font-fallback);
+  --font-body: var(--font-sans);
+  --font-display:
+    "IBM Plex Serif", "IBM Plex Sans", Georgia, "Times New Roman", serif;
+  --font-mono:
+    "IBM Plex Mono", "SF Mono", SFMono-Regular, Consolas, "Liberation Mono",
+    Menlo, monospace;
 
-  /* Base theme tokens */
-  --background: var(--neutral-50);
-  --foreground: var(--neutral-900);
-  --muted: var(--neutral-200);
-  --accent: var(--primary-600);
-  
-  /* Component tokens */
-  --theme-navbar-bg: var(--background);
+  /* ---- Neutral scale (refined, faintly cool — not stark) ---------- */
+  --neutral-50: #f6f7f9;
+  --neutral-100: #eceef2;
+  --neutral-200: #e0e3e9;
+  --neutral-300: #cdd2da;
+  --neutral-400: #9aa2ae;
+  --neutral-500: #6b7480;
+  --neutral-600: #4a515b;
+  --neutral-700: #343a43;
+  --neutral-800: #20252c;
+  --neutral-900: #12161b;
+
+  /* Brand green — a bespoke spruce/mint emerald, deliberately NOT the
+     default Tailwind emerald palette. */
+  --brand-400: #3ad6a3;
+  --brand-500: #16b088;
+  --brand-600: #0e9370;
+  --brand-700: #0a7359;
+
+  /* HSL fragments consumed via hsla(var(--token), …) */
+  --color-base-white: 0, 0%;
+  --color-gray-40: 214, 12%, 55%;
+  --color-black: #10161d;
+
+  /* ---- Radius + border scale -------------------------------------- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --hairline: 1px solid var(--theme-divider);
+
+  /* ---- Semantic theme tokens (LIGHT) ------------------------------ */
+  --theme-bg: #f7f8fa; /* page — a soft cool paper, not stark white */
+  --theme-bg-offset: #ffffff; /* elevated surfaces (cards, nav) */
+  --theme-bg-hover: #edeff3;
+  --theme-bg-accent: rgba(14, 147, 112, 0.09);
+
+  --theme-text: #15191e;
+  --theme-text-light: #434a54;
+  --theme-text-lighter: #697280;
+  --theme-text-accent: var(--brand-700);
+  --theme-color: #ffffff; /* text on --color-black surfaces (table headers) */
+
+  --theme-accent: var(--brand-600);
+  --theme-accent-opacity: 0.12;
+  --theme-on-accent: #ffffff; /* readable text on top of --theme-accent */
+
+  --theme-divider: #e4e7ec;
+
+  --theme-code-bg: #10161d;
+  --theme-code-text: #e6edf3;
+  --theme-code-inline-bg: #edeff3;
+  --theme-code-inline-text: #0a7359;
+
+  --theme-navbar-bg: rgba(247, 248, 250, 0.85);
   --theme-navbar-height: 4rem;
-  --theme-selection-color: white;
-  --theme-selection-bg: var(--accent);
-  --theme-code-bg: var(--neutral-800);
-  --theme-code-text: var(--neutral-100);
+  --theme-sidebar-offset: 5rem;
+
+  --theme-selection-color: #ffffff;
+  --theme-selection-bg: var(--theme-accent);
+
+  /* Crisp, neutral elevation — a real shadow, not a coloured glow. */
+  --theme-glow:
+    0 1px 2px rgba(16, 24, 32, 0.05), 0 10px 28px -12px rgba(16, 24, 32, 0.14);
+
+  /* ---- Compatibility aliases used by index.css & components ------- */
+  --background: var(--theme-bg);
+  --foreground: var(--theme-text);
+  --muted: var(--theme-bg-hover);
+  --accent: var(--theme-accent);
+  --primary: var(--theme-text-accent);
+  --secondary: #7c3aed;
+  --success: var(--brand-600);
+  --error: #ef4444;
+  --accents-1: var(--theme-bg-hover);
+  --accents-2: var(--theme-divider);
+  --accents-3: var(--neutral-400);
+  --accents-4: var(--neutral-500);
+  --accents-5: var(--neutral-700);
 }
 
-/* Dark mode overrides */
+/* ---- Semantic theme tokens (DARK) --------------------------------- */
 :root.theme-dark {
   color-scheme: dark;
-  --background: var(--neutral-900);
-  --foreground: var(--neutral-50);
-  --muted: var(--neutral-800);
-  --accent: var(--primary-500);
-  
-  --theme-navbar-bg: var(--background);
-  --theme-selection-color: var(--neutral-900);
-  --theme-selection-bg: var(--primary-500);
-  --theme-code-bg: var(--neutral-800);
-  --theme-code-text: var(--neutral-100);
+
+  --color-black: #05080b;
+  --color-gray-40: 214, 12%, 62%;
+
+  --theme-bg: #0b0f14;
+  --theme-bg-offset: #11161d;
+  --theme-bg-hover: #1a212a;
+  --theme-bg-accent: rgba(58, 214, 163, 0.13);
+
+  --theme-text: #e7edf3;
+  --theme-text-light: #adb7c2;
+  --theme-text-lighter: #7b8593;
+  --theme-text-accent: var(--brand-400);
+  --theme-color: #ffffff;
+
+  --theme-accent: var(--brand-400);
+  --theme-accent-opacity: 0.18;
+  --theme-on-accent: #052018;
+
+  --theme-divider: #202834;
+
+  --theme-code-bg: #05080b;
+  --theme-code-text: #e6edf3;
+  --theme-code-inline-bg: #1a212a;
+  --theme-code-inline-text: #7ee7b7;
+
+  --theme-navbar-bg: rgba(11, 15, 20, 0.85);
+
+  --theme-selection-color: #052018;
+  --theme-selection-bg: var(--brand-400);
+
+  --theme-glow:
+    0 1px 2px rgba(0, 0, 0, 0.5), 0 14px 36px -14px rgba(0, 0, 0, 0.6);
 }
 
 body {
