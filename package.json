@@ -22,5 +22,9 @@
     "@astrojs/check": "^0.9.8",
     "@types/node": "^22.9.0",
     "typescript": "^5.9.3"
+  },
+  "optionalDependencies": {
+    "@esbuild/linux-x64": "0.21.5",
+    "@rollup/rollup-linux-x64-gnu": "4.27.1"
   }
 }
