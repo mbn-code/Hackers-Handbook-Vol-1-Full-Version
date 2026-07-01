@@ -19,6 +19,14 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const currentPage = Astro.url.pathname;
 const currentFile = `src/pages${currentPage.replace(/\/$/, '')}.md`;
 const githubEditUrl = `${CONFIG.GITHUB_EDIT_URL}/${currentFile}`;
+
+// Flatten the sidebar into reading order so we can offer prev/next chapter
+// navigation — the handbook reads like a book.
+const flatNav = Object.values(CONFIG.SIDEBAR.en).flat();
+const currentSlug = currentPage.replace(/^\//, '').replace(/\/$/, '');
+const navIndex = flatNav.findIndex((entry) => entry.link === currentSlug);
+const prevPage = navIndex > 0 ? flatNav[navIndex - 1] : null;
+const nextPage = navIndex >= 0 && navIndex < flatNav.length - 1 ? flatNav[navIndex + 1] : null;
 ---
 
 <html dir={frontmatter.dir ?? 'ltr'} lang={frontmatter.lang ?? 'en-us'} class="initial">
@@ -26,7 +34,7 @@ const githubEditUrl = `${CONFIG.GITHUB_EDIT_URL}/${currentFile}`;
 		<HeadCommon />
 		<HeadSEO frontmatter={frontmatter} canonicalUrl={canonicalURL} />
 		<title>
-			{frontmatter.title ? `${frontmatter.title}  ${CONFIG.SITE.title}` : CONFIG.SITE.title}
+			{frontmatter.title ? `${frontmatter.title} · ${CONFIG.SITE.title}` : CONFIG.SITE.title}
 		</title>
 		<style>
 			body {
@@ -108,25 +116,77 @@ const githubEditUrl = `${CONFIG.GITHUB_EDIT_URL}/${currentFile}`;
 				height: 100%;
 			}
 
-			.mobile-sidebar-toggle {
-				overflow: hidden;
+			/* Mobile: the left nav becomes a slide-in drawer with a backdrop.
+			   `display: block !important` reliably overrides the scoped base
+			   `#grid-left { display: none }` regardless of style ordering. */
+			@media (max-width: 49.99em) {
+				#grid-left {
+					display: block !important;
+					position: fixed;
+					top: var(--theme-navbar-height);
+					bottom: 0;
+					left: 0;
+					height: auto;
+					width: min(20rem, 82vw);
+					z-index: 50;
+					background: var(--theme-bg);
+					border-right: 1px solid var(--theme-divider);
+					box-shadow: var(--theme-glow);
+					transform: translateX(-100%);
+					transition: transform 0.25s ease;
+					overflow-y: auto;
+					padding: 1rem 0.85rem 2rem;
+				}
+
+				.mobile-sidebar-toggle #grid-left {
+					transform: translateX(0);
+				}
+
+				.mobile-sidebar-toggle {
+					overflow: hidden;
+				}
+
+				#sidebar-backdrop {
+					position: fixed;
+					inset: 0;
+					z-index: 45;
+					background: rgba(2, 6, 12, 0.5);
+					backdrop-filter: blur(1px);
+					opacity: 0;
+					pointer-events: none;
+					transition: opacity 0.25s ease;
+				}
+
+				.mobile-sidebar-toggle #sidebar-backdrop {
+					opacity: 1;
+					pointer-events: auto;
+				}
 			}
 
-			.mobile-sidebar-toggle #grid-left {
-				display: block;
-				top: 2rem;
+			@media (min-width: 50em) {
+				#sidebar-backdrop {
+					display: none;
+				}
 			}
 		</style>
 	</head>
 
 	<body>
+		<div id="reading-progress" aria-hidden="true"></div>
+		<div id="sidebar-backdrop" aria-hidden="true"></div>
 		<Header currentPage={currentPage} />
 		<main class="layout">
 			<aside id="grid-left" class="grid-sidebar" title="Site Navigation">
 				<LeftSidebar currentPage={currentPage} />
 			</aside>
 			<div id="grid-main">
-				<PageContent frontmatter={frontmatter} headings={headings} githubEditUrl={githubEditUrl}>
+				<PageContent
+					frontmatter={frontmatter}
+					headings={headings}
+					githubEditUrl={githubEditUrl}
+					prevPage={prevPage}
+					nextPage={nextPage}
+				>
 					<slot />
 				</PageContent>
 			</div>
@@ -135,5 +195,104 @@ const githubEditUrl = `${CONFIG.GITHUB_EDIT_URL}/${currentFile}`;
 			</aside>
 		</main>
 		<Footer path={currentFile} />
+
+		<style is:global>
+			#reading-progress {
+				position: fixed;
+				top: 0;
+				left: 0;
+				height: 3px;
+				width: 0;
+				background: var(--theme-accent);
+				z-index: 20;
+				transition: width 0.1s linear;
+			}
+
+			.copy-code-btn {
+				position: absolute;
+				top: 0.5rem;
+				right: 0.5rem;
+				display: inline-flex;
+				align-items: center;
+				gap: 0.35rem;
+				padding: 0.3rem 0.6rem;
+				font-family: var(--font-body);
+				font-size: 0.75rem;
+				font-weight: 600;
+				color: var(--theme-code-text);
+				background: rgba(255, 255, 255, 0.08);
+				border: 1px solid rgba(255, 255, 255, 0.15);
+				border-radius: 0.4rem;
+				cursor: pointer;
+				opacity: 0;
+				transition: opacity 0.15s ease, background 0.15s ease;
+			}
+
+			pre:hover .copy-code-btn,
+			.copy-code-btn:focus-visible {
+				opacity: 1;
+			}
+
+			.copy-code-btn:hover {
+				background: rgba(255, 255, 255, 0.16);
+			}
+
+			.copy-code-btn.copied {
+				color: var(--brand-400);
+				border-color: var(--brand-400);
+			}
+		</style>
+
+		<script>
+			// Reading progress bar
+			const bar = document.getElementById('reading-progress');
+			function updateProgress() {
+				const doc = document.documentElement;
+				const scrollable = doc.scrollHeight - doc.clientHeight;
+				const pct = scrollable > 0 ? (doc.scrollTop / scrollable) * 100 : 0;
+				if (bar) bar.style.width = pct + '%';
+			}
+			document.addEventListener('scroll', updateProgress, { passive: true });
+			window.addEventListener('resize', updateProgress);
+			updateProgress();
+
+			// Copy-to-clipboard buttons on code blocks
+			document.querySelectorAll('article pre').forEach((pre) => {
+				const code = pre.querySelector('code');
+				if (!code) return;
+				const btn = document.createElement('button');
+				btn.type = 'button';
+				btn.className = 'copy-code-btn';
+				btn.textContent = 'Copy';
+				btn.setAttribute('aria-label', 'Copy code to clipboard');
+				btn.addEventListener('click', async () => {
+					try {
+						await navigator.clipboard.writeText(code.innerText);
+						btn.textContent = 'Copied!';
+						btn.classList.add('copied');
+						setTimeout(() => {
+							btn.textContent = 'Copy';
+							btn.classList.remove('copied');
+						}, 1600);
+					} catch {
+						btn.textContent = 'Error';
+					}
+				});
+				pre.appendChild(btn);
+			});
+
+			// Mobile nav drawer: close on backdrop tap, Escape, or nav link tap.
+			// We click the (Preact) menu toggle so its internal state stays in sync.
+			const closeDrawer = () => {
+				if (document.body.classList.contains('mobile-sidebar-toggle')) {
+					(document.getElementById('menu-toggle') as HTMLButtonElement | null)?.click();
+				}
+			};
+			document.getElementById('sidebar-backdrop')?.addEventListener('click', closeDrawer);
+			document.addEventListener('keydown', (e) => {
+				if (e.key === 'Escape') closeDrawer();
+			});
+			document.querySelectorAll('#grid-left a').forEach((a) => a.addEventListener('click', closeDrawer));
+		</script>
 	</body>
 </html>

@@ -1,0 +1,111 @@
+---
+import Icon from '../Icon.astro';
+
+type Link = { text: string; link: string } | null;
+type Props = { prev: Link; next: Link };
+const { prev, next } = Astro.props as Props;
+---
+
+{
+	(prev || next) && (
+		<nav class="pager" aria-label="Chapter navigation">
+			{prev ? (
+				<a class="pager-link prev" href={'/' + prev.link}>
+					<Icon name="arrow-left" size={18} />
+					<span class="pager-text">
+						<span class="pager-dir">Previous</span>
+						<span class="pager-title">{prev.text}</span>
+					</span>
+				</a>
+			) : (
+				<span />
+			)}
+			{next ? (
+				<a class="pager-link next" href={'/' + next.link}>
+					<span class="pager-text">
+						<span class="pager-dir">Next</span>
+						<span class="pager-title">{next.text}</span>
+					</span>
+					<Icon name="arrow-right" size={18} />
+				</a>
+			) : (
+				<span />
+			)}
+		</nav>
+	)
+}
+
+<style>
+	.pager {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1rem;
+		margin-top: 3.5rem;
+		padding-top: 2rem;
+		border-top: var(--hairline);
+	}
+
+	.pager-link {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 1rem 1.15rem;
+		border: var(--hairline);
+		border-radius: var(--radius-md);
+		background: var(--theme-bg-offset);
+		color: var(--theme-text);
+		text-decoration: none;
+		transition: border-color 0.15s ease, background 0.15s ease;
+	}
+
+	.pager-link:hover {
+		border-color: var(--theme-accent);
+		background: var(--theme-bg-hover);
+		text-decoration: none;
+	}
+
+	.pager-link.next {
+		justify-content: flex-end;
+		text-align: right;
+	}
+
+	.pager-link :global(svg) {
+		flex-shrink: 0;
+		color: var(--theme-text-lighter);
+		transition: color 0.15s ease;
+	}
+
+	.pager-link:hover :global(svg) {
+		color: var(--theme-text-accent);
+	}
+
+	.pager-text {
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+	}
+
+	.pager-dir {
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		font-weight: 500;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		color: var(--theme-text-lighter);
+	}
+
+	.pager-title {
+		font-weight: 600;
+		font-size: 0.98rem;
+		color: var(--theme-text);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	@media (max-width: 40em) {
+		.pager {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

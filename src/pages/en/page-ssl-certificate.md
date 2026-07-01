@@ -1,47 +1,74 @@
 ---
-title: SSL Certificate
-description: A digital certificate that authenticates the identity of a website and encrypts data transmitted between the user's browser and the web server.
+title: SSL/TLS Certificate
+description: How SSL/TLS certificates authenticate websites and encrypt traffic, how the handshake and certificate chain work, and how to inspect them with OpenSSL.
 layout: ../../layouts/MainLayout.astro
 ---
 
-# SSL Certificate
+An SSL/TLS certificate is a signed digital document that binds a public key to a hostname, letting a browser verify who it is talking to and set up an encrypted channel. In practice, it is the trust anchor behind the padlock and every `https://` address you use.
 
-An SSL (Secure Sockets Layer) certificate is a digital certificate that serves as a critical component in ensuring the security and privacy of data exchanged between a user's web browser and a website's server. It plays a vital role in authenticating the identity of the website and enabling encrypted communication, making it a fundamental technology for secure internet browsing.
+## SSL vs. TLS
 
-## What Is an SSL Certificate?
+"SSL certificate" is the name everyone still uses, but the SSL protocol itself is dead. SSL 2.0 and 3.0 are broken and disabled everywhere, and TLS 1.0/1.1 were deprecated in 2021. Modern connections run on **TLS 1.2** or **TLS 1.3**. The certificate is the same object regardless; only the handshake protocol changed. When you read "SSL certificate," think TLS.
 
-An SSL certificate is a cryptographic key that enables secure and encrypted data transmission over the internet. When a user visits a website protected by an SSL certificate, several key functions come into play:
+## What the Certificate Actually Does
 
-1. **Authentication:** SSL certificates verify the identity of the website's owner. They confirm that the website is legitimate and operated by the entity it claims to represent. This prevents attackers from impersonating the website.
+A certificate ties three things together and gets signed by a trusted authority:
 
-2. **Encryption:** SSL certificates encrypt the data exchanged between the user's browser and the web server. Encryption ensures that even if a malicious actor intercepts the data in transit, they cannot decipher or misuse it.
+- **Identity** — one or more hostnames in the Subject Alternative Name (SAN) field.
+- **A public key** — used during the handshake to prove the server owns the matching private key.
+- **A signature** — from a Certificate Authority (CA) whose root the browser already trusts.
 
-3. **Data Integrity:** SSL certificates also guarantee the integrity of data during transmission. Any alterations to the data are detected, ensuring that the user receives unaltered and reliable information.
+That signature is the whole point. Anyone can generate a key pair, but only a CA that validated control of the domain will vouch for it. The certificate provides **authentication** (you are talking to the real host) and enables **encryption** and **integrity** for the session that follows. See [Cryptography](/en/page-cryptography) for the underlying primitives.
 
-## Why SSL Certificates Are Important
+## The TLS Handshake, Briefly
 
-The importance of SSL certificates can be summarized as follows:
+1. The client says hello and offers the cipher suites and TLS versions it supports.
+2. The server replies with its certificate (and any intermediate certificates in the chain).
+3. The client validates the chain up to a trusted root, checks the hostname, and confirms the certificate is in date and not revoked.
+4. Both sides derive a shared session key. TLS 1.3 uses ephemeral Diffie-Hellman, so each session gets **forward secrecy** — capturing the traffic and later stealing the server key still will not decrypt past sessions.
 
-1. **Data Security:** SSL certificates protect sensitive data, such as login credentials, personal information, and financial details, from eavesdropping and interception.
+After the handshake, symmetric encryption protects the actual data. This is why passive [packet sniffing](/en/page-packet-sniffing) on a WPA2 network or a shared switch yields ciphertext, not credentials — the plaintext never crosses the wire.
 
-2. **Trust and Credibility:** Websites with SSL certificates display visual indicators like the padlock icon and "https://" in the URL, indicating a secure connection. This builds trust with users.
+## The Chain of Trust
 
-3. **Search Engine Ranking:** Search engines consider SSL encryption as a ranking factor. Websites with SSL certificates tend to rank higher in search results.
+Browsers do not trust your server certificate directly. They trust a small set of **root CAs** shipped with the OS or browser. Roots sign **intermediate** certificates, which in turn sign the **leaf** certificate for your domain. A validator walks this chain from leaf to root; if any link is missing, expired, or untrusted, the connection fails. A common production bug is forgetting to serve the intermediate certificate — it works in one browser that cached the intermediate and breaks in another.
 
-4. **Legal and Compliance Requirements:** Many industries and regulations require the use of SSL certificates to protect customer data and maintain legal compliance.
+## Validation Levels
 
-## How to Identify SSL-Protected Websites
+- **Domain Validation (DV):** the CA only checks that you control the domain. Free and automated (e.g. via ACME/Let's Encrypt). This covers the vast majority of the web.
+- **Organisation Validation (OV):** the CA also verifies the organisation exists.
+- **Extended Validation (EV):** the strictest identity vetting.
 
-You can easily identify websites that use SSL certificates by looking for the following indicators in your web browser:
+A note on EV: older guides claim EV shows a "green address bar with the company name." Modern Chrome, Firefox, and Safari removed that UI years ago, because studies showed users ignored it. Today, DV and EV look identical in the address bar — a plain padlock. The padlock means the connection is encrypted and the certificate is valid. It does **not** mean the site is honest, which is why phishing kits happily serve valid HTTPS. Pair this page with [The Art of Phishing](/en/page-5).
 
-- **Padlock Icon:** A padlock symbol appears in the address bar, typically to the left of the URL. It indicates a secure connection.
+## Inspecting a Certificate
 
-- **"https://" in URL:** Secure websites have "https://" at the beginning of their URLs, where the "s" stands for "secure."
+You can read any public certificate from the command line with OpenSSL:
 
-- **Extended Validation (EV) Certificates:** Some SSL certificates provide extended validation, which involves rigorous identity verification and results in a green address bar with the organization's name.
+```bash
+# Fetch and show the full certificate for a host
+openssl s_client -connect example.com:443 -servername example.com </dev/null \
+  | openssl x509 -noout -text
 
-- **Certificate Details:** Most browsers allow you to view the SSL certificate details for a website. This information includes the certificate's validity and the issuing authority.
+# Just the essentials: issuer, subject, validity dates, and SANs
+echo | openssl s_client -connect example.com:443 -servername example.com 2>/dev/null \
+  | openssl x509 -noout -issuer -subject -dates -ext subjectAltName
+```
 
-## Conclusion
+The `-servername` flag sets the SNI value so the server returns the right certificate when several sites share one IP. To check what a running server negotiates, add `-tls1_3` or `-tls1_2` to force a version.
 
-SSL certificates are an essential part of modern web security. They protect sensitive data, establish trust with users, and are a fundamental component in ensuring secure and private online interactions. By using SSL certificates, website owners and operators contribute to a safer and more secure internet experience for everyone.
+## Why It Matters for Security Work
+
+- **Recon:** the SAN field of a certificate often leaks internal hostnames and subdomains. Certificate transparency logs (searchable via crt.sh) are a standard passive reconnaissance source during authorised assessments.
+- **Misconfiguration hunting:** expired certificates, weak cipher suites, self-signed certificates on production, or an incomplete chain are frequent findings. Tools like `testssl.sh` and Qualys SSL Labs grade a server's TLS posture.
+- **Interception with consent:** proxies such as [Burp Suite](/en/page-burp-suite) intercept HTTPS by installing their own CA in the client trust store, then minting per-host certificates on the fly. This only works on devices you control and configure — it is exactly the trust model TLS is designed to prevent an attacker from abusing.
+
+Always keep certificate handling inside the scope of authorised testing. Presenting a fraudulent certificate or stripping TLS on traffic you do not own is illegal — review [Legal and Ethical Considerations](/en/page-legal-ethical) before touching live systems.
+
+## Defensive Checklist
+
+- Serve TLS 1.2 and 1.3 only; disable everything older.
+- Include the full chain (leaf plus intermediates).
+- Automate renewal so certificates never lapse.
+- Enable HSTS so browsers refuse to downgrade to plaintext HTTP.
+- Protect the private key with strict file permissions and, ideally, hardware or a secret manager.

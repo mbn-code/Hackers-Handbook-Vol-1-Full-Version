@@ -1,50 +1,105 @@
 ---
-title: IP Addresses 
-description: What is an IP address, how does it work, and why do hackers care?
+title: IP Addresses
+description: How IP addresses work, IPv4 vs IPv6, public vs private ranges, NAT, DNS, and why every security assessment starts with an IP.
 layout: ../../layouts/MainLayout.astro
 ---
 
-# What is an IP Address? 
+Every packet that crosses a network carries a source and a destination IP address. Understand those two numbers and you understand where traffic comes from, where it is going, and where an attacker has to reach to touch a target.
 
-In the world of  [Networking](page-networking), **IP** stands for **Internet Protocol**. 
+## What an IP Address Is
 
-An IP address is a unique numerical label assigned to every single device connected to a computer network. If you want to send a letter to a friend, you need their home address. If a computer wants to send data to a web server, it needs the server's IP address.
+**IP** stands for **Internet Protocol**, the addressing scheme that lets independent networks route data to one another. An IP address is the numerical label assigned to a device on a network so other devices can find and talk to it. In [Networking](/en/page-networking) terms, it is the layer-3 identifier that routers use to forward [packets](/en/page-packets) hop by hop toward their destination.
 
-## IPv4 vs. IPv6 
+The postal analogy is close but incomplete. A street address is fixed to a house; an IP address is often leased temporarily (via DHCP) and can change. What stays constant is the job: it identifies _where_, while ports identify _which service_ on that host.
 
-There are two main versions of IP addresses in use today:
+## IPv4 vs. IPv6
 
-1. **IPv4 (Internet Protocol version 4):** 
-  , Looks like this: `192.168.1.5`
-  , It's made up of four numbers separated by periods (dots). Each number ranges from 0 to 255.
-  , Because the internet grew so fast, we actually ran out of available IPv4 addresses!
+Two versions of the protocol run side by side on the modern internet.
 
-2. **IPv6 (Internet Protocol version 6):**
-  , Looks like this: `2001:0db8:85a3:0000:0000:8a2e:0370:7334`
-  , It uses hexadecimal numbers and colons. 
-  , It provides an almost infinite number of unique addresses to solve the IPv4 shortage.
+**IPv4** addresses are 32 bits, written as four decimal octets from 0 to 255, separated by dots:
 
-## Public vs. Private IP Addresses 
+```
+192.168.1.5
+```
 
-This is a crucial concept for cybersecurity:
+That gives roughly 4.3 billion addresses. It sounds like a lot, but the pool of unallocated blocks was exhausted years ago, which is why techniques like NAT (below) became universal.
 
-- **Public IP Address:** This is the address assigned to your router by your Internet Service Provider (ISP). It is visible to the entire internet. When you visit a website, the website sees your Public IP.
-- **Private (Local) IP Address:** This is the address assigned to your specific device (laptop, phone, smart TV) *inside* your home or corporate network. These usually start with `192.168.x.x` or `10.x.x.x`. They are hidden from the outside internet.
+**IPv6** addresses are 128 bits, written as eight groups of four hexadecimal digits separated by colons:
 
-*Note: Your router acts as a translator between your Private IP and your Public IP using a technology called NAT (Network Address Translation).*
+```
+2001:0db8:85a3:0000:0000:8a2e:0370:7334
+```
 
-## The Domain Name System (DNS) 
+Leading zeros in a group can be dropped, and one run of all-zero groups can be collapsed to `::`, so the address above shortens to `2001:db8:85a3::8a2e:370:7334`. The address space is vast enough (about 3.4 x 10^38 addresses) that scanning an entire IPv6 subnet by brute force is impractical, which changes how reconnaissance works.
 
-Humans are bad at remembering numbers like `142.250.190.46`, but we are great at remembering names like `google.com`. 
+## Public vs. Private Addresses
 
-DNS acts as the phonebook of the internet. When you type a domain name into your browser, your computer silently asks a DNS server, "Hey, what is the IP address for google.com?" The DNS server replies with the IP, and your browser connects to it. 
+This distinction matters for almost every security decision you make.
 
-Hackers often target DNS to redirect users to malicious, fake websites (a technique related to  [Phishing](page-5)).
+- **Public IP** – Assigned to your router by your Internet Service Provider (ISP) and routable across the global internet. Any server you connect to sees this address. It is the address an attacker on the internet can actually reach.
+- **Private (local) IP** – Assigned to devices _inside_ your LAN and not routable on the public internet. Three reserved IPv4 ranges (RFC 1918) are set aside for private use:
 
-## Why Hackers Care About IPs 
+```
+10.0.0.0     – 10.255.255.255   (10.0.0.0/8)
+172.16.0.0   – 172.31.255.255   (172.16.0.0/12)
+192.168.0.0  – 192.168.255.255  (192.168.0.0/16)
+```
 
-IP addresses are the starting point for almost every cyber attack:
-- **Targeting:** Before you can hack a server, you need to know its IP address. Hackers use DNS enumeration tools to find the IP addresses associated with a target company.
-- **Scanning:** Hackers use tools like  [Nmap](page-4) to scan an IP address to see what ports are open and what software is running.
-- **Tracking & Anonymity:** When you do *anything* online, you leave a footprint of your IP address. This is why hackers (and privacy advocates) use a  [VPN](page-vpn) or  [Proxy Server](page-proxy-server) to mask their real IP address and hide their identity. 
-- **Special IPs:** There are special IPs, like `127.0.0.1`, which is known as  [Localhost](page-localhost). It always points back to your own computer!
+Your laptop, phone, and printer typically hold addresses from `192.168.x.x` or `10.x.x.x`. From the internet they are invisible; from an attacker's perspective, reaching them requires first getting _inside_ the network or through the router.
+
+### NAT: One Public IP for a Whole Network
+
+Network Address Translation lets many private devices share a single public IP. The router rewrites the source address (and port) on outbound packets and keeps a table so replies get mapped back to the right internal device. NAT is why your dozen home devices all appear to the outside world as one address, and it is a big part of why private hosts are not directly reachable from the internet without deliberate port forwarding.
+
+## Finding Your Own Addresses
+
+Knowing how to read your own configuration is the first practical skill. On Linux or macOS:
+
+```bash
+ip addr show          # Linux: all interfaces and their IPs
+ifconfig              # older systems / macOS
+curl ifconfig.me      # ask an external service for your PUBLIC IP
+```
+
+On Windows, `ipconfig` shows interface addresses. The private address lives on your network adapter; the public one is only visible from outside, which is why you query an external service to see it.
+
+## The Domain Name System (DNS)
+
+People remember names, not numbers. DNS is the distributed directory that translates a hostname like `example.com` into an IP address a machine can route to. When you type a domain into your browser, your resolver walks the DNS hierarchy (root, top-level domain, then the authoritative server) and returns the address, which your browser then connects to.
+
+You can watch this happen from the command line:
+
+```bash
+dig example.com +short      # returns the IPv4 (A) records
+dig AAAA example.com +short # ask specifically for IPv6 (AAAA) records
+nslookup example.com        # cross-platform alternative
+```
+
+DNS is also an attack surface. Poisoning a resolver's cache or tampering with responses can silently redirect victims to a look-alike server, a technique closely tied to [phishing](/en/page-phishing-attack) and man-in-the-middle attacks. Defensive DNS (DNSSEC, encrypted DNS over HTTPS/TLS) exists precisely because plain DNS was designed without authentication.
+
+## Why IP Addresses Matter in Security
+
+In authorised testing and defence, the IP address is where nearly every workflow begins.
+
+- **Reconnaissance** – Before touching a target you must map its footprint. DNS enumeration and passive lookups turn a company name into the set of IP ranges it owns. This is the scoping stage of any [ethical hacking](/en/page-ethical-hacking) engagement, and you only probe addresses your rules of engagement authorise.
+- **Scanning** – With an in-scope IP, tools like [Nmap](/en/page-4) reveal which ports are open and which services and versions answer. See [Port Scanning](/en/page-port-scanning) for how that maps the attack surface.
+- **Traffic analysis** – On a network you control, [packet sniffing](/en/page-packet-sniffing) with Wireshark shows the source and destination IPs of every conversation, which is how defenders spot anomalies and how analysts reconstruct an intrusion.
+- **Attribution and anonymity** – Every connection you make records your IP somewhere. Security testers, researchers, and privacy-conscious users route traffic through a [VPN](/en/page-vpn) or [proxy server](/en/page-proxy-server) to change the address a target sees. On the defensive side, blocking or rate-limiting hostile IP ranges is a first line of control.
+
+### Reserved and Special Addresses
+
+A few addresses never behave like normal hosts:
+
+- `127.0.0.1` (and the whole `127.0.0.0/8` block) is [localhost](/en/page-localhost) — traffic sent here loops back to your own machine and never hits the wire.
+- `0.0.0.0` means "this host" or, in a listener, "all interfaces."
+- `169.254.x.x` is a link-local address a device self-assigns when DHCP fails.
+- `255.255.255.255` is the limited broadcast address for the local segment.
+
+Recognising these on sight saves time: a service bound to `127.0.0.1` is not reachable from other machines, while one bound to `0.0.0.0` is exposed to the whole network — a distinction that is often the difference between a safe default and an accidental exposure.
+
+## Key Takeaways
+
+- IPv4 (dotted decimal) is running out; IPv6 (hexadecimal, colon-separated) provides the long-term address space.
+- Public addresses are reachable from the internet; RFC 1918 private ranges are not, and NAT bridges the two.
+- DNS maps names to addresses and is itself a target worth defending.
+- In legitimate security work you scan only IPs you own or are explicitly authorised to test. The address is the starting coordinate — everything else builds on it.

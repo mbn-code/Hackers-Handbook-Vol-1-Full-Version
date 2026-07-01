@@ -1,0 +1,113 @@
+---
+import HeadCommon from '../components/HeadCommon.astro';
+import HeadSEO from '../components/HeadSEO.astro';
+import AstroLogo from '../components/Header/AstroLogo.astro';
+import * as CONFIG from '../config';
+
+const canonicalURL = new URL('/404', Astro.site);
+---
+
+<html lang="en" class="initial">
+	<head>
+		<HeadCommon />
+		<HeadSEO
+			frontmatter={{ title: 'Page not found', description: '404 — this page could not be found.', layout: '' }}
+			canonicalUrl={canonicalURL}
+		/>
+		<title>404 — Page not found · {CONFIG.SITE.title}</title>
+		<meta name="robots" content="noindex" />
+	</head>
+	<body>
+		<main class="notfound">
+			<a class="brand" href="/">
+				<AstroLogo size={40} />
+			</a>
+			<p class="code">404</p>
+			<pre class="term"><code><span class="p">$</span> cat /page<span class="cursor">_</span>
+bash: /page: <span class="err">No such file or directory</span></code></pre>
+			<h1>This page slipped past the firewall.</h1>
+			<p class="lead">
+				The link may be broken or the page may have moved. Let's get you back on track.
+			</p>
+			<div class="cta-row">
+				<a class="btn-primary" href="/en/introduction">Go to the handbook</a>
+				<a class="btn-secondary" href="/">Back to home</a>
+			</div>
+		</main>
+	</body>
+</html>
+
+<style>
+	.notfound {
+		max-width: 40rem;
+		margin: 0 auto;
+		padding: 5rem 1.5rem;
+		text-align: center;
+	}
+
+	.brand {
+		display: inline-flex;
+		margin-bottom: 1.5rem;
+	}
+
+	.code {
+		font-family: var(--font-mono);
+		font-size: clamp(4rem, 18vw, 9rem);
+		font-weight: 800;
+		line-height: 1;
+		color: var(--theme-text-accent);
+		margin: 0;
+		letter-spacing: -0.03em;
+	}
+
+	.term {
+		text-align: left;
+		max-width: 30rem;
+		margin: 1.5rem auto;
+		background: var(--theme-code-bg);
+		color: var(--theme-code-text);
+		border: 1px solid var(--theme-divider);
+		border-radius: 0.6rem;
+		padding: 1rem 1.25rem;
+		font-size: 0.9rem;
+		line-height: 1.6;
+		overflow-x: auto;
+	}
+
+	.term .p {
+		color: var(--brand-400);
+	}
+	.term .err {
+		color: #f87171;
+	}
+	.term .cursor {
+		animation: blink 1s steps(1) infinite;
+	}
+
+	@keyframes blink {
+		50% {
+			opacity: 0;
+		}
+	}
+
+	.notfound h1 {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: clamp(1.7rem, 4vw, 2.4rem);
+		letter-spacing: -0.015em;
+		margin: 1.25rem 0 0.75rem;
+	}
+
+	.lead {
+		color: var(--theme-text-light);
+		font-size: 1.1rem;
+	}
+
+	.cta-row {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.85rem;
+		margin-top: 1.75rem;
+	}
+</style>

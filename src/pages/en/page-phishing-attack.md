@@ -1,51 +1,66 @@
 ---
 title: Phishing Attack
-description: A fraudulent attempt to obtain sensitive information, such as login credentials and credit card details, by posing as a trustworthy entity in electronic communication.
+description: How phishing works, the main variants (spear phishing, vishing, smishing, BEC), and the technical and human defences that actually stop credential theft.
 layout: ../../layouts/MainLayout.astro
 ---
 
-# Phishing Attack
+Phishing is the practice of impersonating a trusted party to trick a target into handing over credentials, payment details, or access. It remains one of the most common initial-access techniques because it attacks people and process, not code. This page explains how phishing works and how defenders detect and blunt it. Only run realistic phishing simulations against people and systems you are explicitly authorised to test.
 
-Phishing is a cyberattack method that involves fraudulent attempts to obtain sensitive information, such as login credentials, credit card details, and personal information, by posing as a trustworthy and legitimate entity in electronic communication. These deceptive messages or websites aim to trick individuals into disclosing their confidential data, which can then be exploited for malicious purposes.
+## How Phishing Works
 
-## How Phishing Attacks Work
+A phishing campaign is applied [social engineering](/en/page-socialEngineering): the attacker frames a message so the target's fastest response is the wrong one. The mechanics are consistent across channels.
 
-Phishing attacks typically involve the following steps:
+- **Pretext and impersonation.** The message poses as a bank, employer, courier, IT helpdesk, or a familiar colleague. Sender names, logos, and domains are spoofed or made to look near-identical (for example, `paypa1.com` or `micros0ft-support.com`).
+- **Emotional trigger.** Urgency ("your account will be suspended"), fear, authority, or reward pushes the target to act before they verify. This is the core lever, not the technology.
+- **The hook.** A link to a credential-harvesting page, a malicious attachment, a fake login prompt, or a request to reply with sensitive data. Modern kits often relay the login in real time so they can capture the [2FA](</en/page-two-factor-authentication-(2fa)>) code too.
+- **Payload or capture.** Entered credentials are logged, or an attachment drops [malware](/en/page-malware) such as a [trojan](/en/page-trojan) that establishes a [backdoor](/en/page-backdoor) for later access.
 
-1. **Impersonation:** The attacker pretends to be a legitimate entity, often mimicking well-known companies, financial institutions, or government organizations. They may use email, social media, or other communication channels.
+Credential-harvesting pages are usually plain [web pages](/en/page-web-hacking): a cloned login form that POSTs whatever the victim types to the attacker's server, then redirects to the real site so nothing seems wrong.
 
-2. **Deceptive Messages:** Victims receive deceptive messages that appear to be from a trusted source. These messages can include emails, instant messages, or social media posts. The content often contains urgent or enticing language to encourage immediate action.
+## Common Variants
 
-3. **Social Engineering:** Phishing relies on social engineering tactics to manipulate the victim's emotions and behavior. Common approaches include creating a sense of urgency, fear, or curiosity to prompt the victim to click on a link or download an attachment.
+- **Email phishing.** High-volume, untargeted messages impersonating well-known brands. Cheap to send, low per-message success rate, still effective at scale.
+- **Spear phishing.** Tailored to a specific person or team using researched details (role, projects, vendors). Far higher success rate because the pretext fits the target's real context.
+- **Whaling.** Spear phishing aimed at executives or other high-value accounts, where a single compromise unlocks payments or sensitive data.
+- **Business Email Compromise (BEC).** A hijacked or spoofed internal/vendor account is used to redirect a wire transfer or invoice. Often text-only with no malicious link, so it slips past link scanners.
+- **Vishing (voice).** Phone calls impersonating IT, a bank, or a supplier. Increasingly boosted with AI voice cloning of a known person.
+- **Smishing (SMS).** Text messages with malicious links or callback numbers, exploiting the trust and small screens of mobile.
+- **Pharming.** Redirecting a correct URL to a fake site by poisoning DNS or altering a host's resolver, so even a careful user lands on the attacker's page.
+- **QR phishing ("quishing").** A QR code carries the malicious link, moving the click to a phone that may lack corporate filtering.
 
-4. **Malicious Links and Attachments:** Phishing messages typically include links to fraudulent websites or attachments containing malware. Clicking on these links or opening attachments can compromise the victim's device and expose their information.
+## Recognising a Phishing Message
 
-## Types of Phishing Attacks
+- The domain is close-but-wrong, or the display name hides a different underlying address.
+- Unexpected urgency, threats, or too-good-to-be-true offers.
+- Generic greetings, or small errors in tone, branding, or grammar.
+- Links whose preview target does not match the claimed destination.
+- Any unsolicited request for passwords, codes, or payment changes. Legitimate providers do not ask for your password or 2FA code.
 
-Phishing attacks come in various forms, each with its own approach and objectives:
+```bash
+# Inspect email headers for spoofing: check that SPF/DKIM/DMARC pass
+# and that the Return-Path aligns with the visible From domain.
+grep -iE "Authentication-Results|Received-SPF|DKIM-Signature|Return-Path" message.eml
+```
 
-1. **Email Phishing:** Attackers send fraudulent emails that impersonate legitimate organizations, often requesting sensitive information or directing victims to malicious websites.
+## Defences That Work
 
-2. **Spear Phishing:** A targeted form of phishing that focuses on specific individuals or organizations. Attackers gather information about the target to create highly convincing messages.
+No single control is enough; layer human, email, and account defences.
 
-3. **Pharming:** Involves redirecting victims to fraudulent websites by altering the DNS (Domain Name System) settings or compromising the website's security.
+**Technical**
 
-4. **Vishing (Voice Phishing):** Attackers use phone calls to impersonate legitimate entities and extract information over the phone.
+- Enforce **SPF, DKIM, and DMARC** on your domains, with DMARC set to `p=reject` once monitoring is clean, so attackers cannot spoof your addresses. Filter and quarantine lookalike inbound domains.
+- Require [phishing-resistant 2FA](</en/page-two-factor-authentication-(2fa)>) — FIDO2/WebAuthn security keys or passkeys — which bind authentication to the real site and defeat real-time credential relays that beat SMS or app codes.
+- Use [strong, unique passwords](/en/page-secure-passwords) from a password manager; managers refuse to autofill on the wrong domain, which is itself a phishing tripwire.
+- Deploy [firewalls](/en/page-firewall) and DNS/URL filtering to block known malicious destinations, and keep endpoints patched to limit attachment payloads.
 
-5. **Smishing (SMS Phishing):** Phishing attacks through text messages, often including malicious links or prompts to call a fraudulent number.
+**Human and process**
 
-## Protecting Against Phishing Attacks
+- Train people to verify out of band: confirm any payment change or credential request through a known channel, never by replying to the message.
+- Run authorised phishing simulations to measure and improve click rates, and reward reporting rather than punishing clicks.
+- Give staff a fast, blameless way to report suspected phishing so the security team can pull related messages.
 
-To protect against phishing attacks, individuals and organizations can take the following precautions:
+When a phish does land, treat it as an intrusion: rotate exposed credentials, revoke sessions, and follow your [incident response](/en/page-incident-response) plan to contain and investigate.
 
-1. **Verify the Source:** Always verify the sender's email address or phone number, especially if you receive unsolicited requests for sensitive information.
+## Related Topics
 
-2. **Use Two-Factor Authentication (2FA):** Enable 2FA for your online accounts to add an extra layer of security.
-
-3. **Beware of Urgency:** Be cautious of messages that create a sense of urgency, as attackers often use this tactic.
-
-4. **Hover Before You Click:** Hover your mouse cursor over links in emails to preview the destination URL. Do not click on suspicious links.
-
-5. **Educate and Train:** Provide cybersecurity training to employees and individuals to raise awareness about phishing threats.
-
-Phishing attacks continue to evolve, making it essential for individuals and organizations to remain vigilant and informed. By recognizing the signs of phishing and taking preventive measures, you can protect yourself and your data from falling into the hands of cybercriminals.
+Phishing rarely stands alone. It is the delivery step for many campaigns covered elsewhere in this handbook: the broader discipline of [social engineering](/en/page-socialEngineering), the [malware](/en/page-malware) it often carries, and the [ethical, legal boundaries](/en/page-legal-ethical) that govern any authorised phishing test.

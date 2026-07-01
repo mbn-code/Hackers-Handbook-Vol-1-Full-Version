@@ -1,43 +1,66 @@
 ---
 title: Decryption
-description: The process of converting encrypted data back into its original form, allowing authorized users to access the information.
+description: Decryption reverses encryption to recover plaintext. Learn symmetric vs asymmetric keys, real openssl and gpg examples, and why key management matters most.
 layout: ../../layouts/MainLayout.astro
 ---
 
-# Decryption
+Decryption is the process that turns ciphertext back into readable plaintext using the correct key and algorithm. It is the mirror image of [encryption](/en/page-encryption): whoever holds the right key can recover the data, and whoever does not should face work that is computationally infeasible.
 
-Decryption is the process of converting encrypted data back into its original, readable form. This transformation allows authorized users to access and understand the information, which was previously protected by encryption.
+## Decryption in one sentence
 
-## Understanding Encryption and Decryption
+Given ciphertext, an algorithm, and a key, decryption produces the original message. The security of the whole scheme does not rest on hiding the algorithm — it rests on protecting the key. This is Kerckhoffs's principle, and every serious cryptosystem assumes attackers already know the algorithm you use.
 
-To grasp the concept of decryption fully, it's essential to understand its relationship with encryption:
+## Symmetric vs asymmetric decryption
 
-- **Encryption:** Encryption is the process of converting plain, readable data into an unreadable format using encryption algorithms and keys. The result is known as ciphertext.
+The kind of key you need depends on how the data was encrypted. Understanding both is the core of practical [cryptography](/en/page-cryptography).
 
-- **Decryption:** Decryption, on the other hand, is the reversal of this process. It involves using the appropriate decryption key to transform ciphertext back into its original, plain form.
+### Symmetric decryption
 
-## Key Components of Decryption
+The same secret key both encrypts and decrypts. Modern symmetric ciphers like AES are fast and protect the bulk of data in transit and at rest — disk volumes, database fields, TLS session traffic. The challenge is distribution: both parties must already share the secret without an eavesdropper capturing it.
 
-Decryption involves several key components:
+```bash
+# Encrypt a file with AES-256 (prompts for a passphrase)
+openssl enc -aes-256-cbc -pbkdf2 -salt -in secret.txt -out secret.enc
 
-1. **Ciphertext:** This is the encrypted data that needs to be decrypted. It appears as random or unreadable characters until the decryption process is applied.
+# Decrypt it back with the same passphrase
+openssl enc -d -aes-256-cbc -pbkdf2 -in secret.enc -out secret.txt
+```
 
-2. **Decryption Key:** To decrypt data, a decryption key is required. This key corresponds to the specific encryption key used in the encryption process. Without the correct decryption key, it is practically impossible to decipher the ciphertext.
+### Asymmetric decryption
 
-3. **Decryption Algorithm:** A decryption algorithm is a set of rules and procedures that outline how the decryption key is used to reverse the encryption process and produce the original data.
+A key pair splits the roles: a public key encrypts, and only the matching private key decrypts. This solves the distribution problem — you can publish your public key freely. RSA and elliptic-curve schemes underpin email encryption, code signing, and the certificate exchange behind every [SSL/TLS certificate](/en/page-ssl-certificate).
 
-## Common Use Cases
+```bash
+# Recipient decrypts a message with their private key
+gpg --output message.txt --decrypt message.txt.gpg
+```
 
-Decryption plays a crucial role in various contexts, including:
+In practice the two are combined. TLS uses asymmetric cryptography to agree on a shared symmetric key, then switches to fast symmetric encryption for the actual session data.
 
-- **Data Security:** Decryption is used to access confidential data securely stored or transmitted in an encrypted format. Authorized parties use their decryption keys to retrieve and work with the data.
+## What decryption is not: attacking ciphertext
 
-- **Secure Communication:** Secure messaging platforms and email services use encryption to protect the content of messages. Recipients use decryption keys to read the messages.
+Legitimate decryption means you hold the key. Recovering plaintext _without_ the key is a different discipline — cryptanalysis — and it is exactly what strong ciphers are designed to defeat.
 
-- **File Access:** Encrypted files and folders are common in data protection. Decryption keys are essential for authorized access.
+- **Brute force** tries every possible key. Against a properly random 256-bit key this is hopeless; against a weak passphrase it is trivial. See how a [brute force attack](/en/page-brute-force-attack) exploits low-entropy secrets and why strong passwords matter.
+- **Weak or broken algorithms** (DES, RC4, MD5-based constructions) fall to known attacks and should never be relied on.
+- **Implementation flaws** — reused nonces, predictable random number generators, padding-oracle bugs, or leaked keys — break systems far more often than the underlying math does.
 
-## Importance of Key Management
+In authorised security work, decrypting captured or stored data must stay inside your engagement scope. Recovering keys and plaintext from systems you do not own or have written permission to test is illegal. This kind of analysis appears legitimately in digital forensics and malware analysis, where investigators work on evidence they are cleared to examine.
 
-Effective decryption relies on secure key management. It is vital to safeguard decryption keys, ensuring they are only accessible to authorized users. If decryption keys fall into the wrong hands, the security of encrypted data can be compromised.
+## Where decryption happens
 
-In summary, decryption is the process of converting encrypted data back into its original, readable form. It is a critical component of data security, secure communication, and file access, and it relies on secure key management for its effectiveness.
+- **Data at rest:** encrypted disks, backups, and databases are decrypted transparently once the correct key or passphrase unlocks the volume.
+- **Data in transit:** browsers and servers decrypt TLS traffic on the fly so applications see plaintext while the wire stays protected.
+- **Secure messaging:** end-to-end encrypted apps decrypt only on the recipient's device, so the provider never sees the message.
+- **Signed and encrypted files:** GPG and similar tools decrypt archives, emails, and release artifacts for the intended holder of the private key.
+
+## Key management decides everything
+
+The strongest cipher is worthless if the key leaks. A stolen decryption key hands an attacker the plaintext instantly — no cryptanalysis required, and this is how most real breaches unfold. Treat keys as the crown jewels:
+
+- Store keys in a hardware security module, OS keystore, or a dedicated secrets manager — never hard-coded in source or config files.
+- Rotate keys on a schedule and immediately after any suspected exposure.
+- Enforce least privilege so only the services and people that must decrypt can reach a key.
+- Protect passphrases with a modern key-derivation function (PBKDF2, scrypt, or Argon2) so a weak password does not become a weak key.
+
+Applying these habits when you build systems is a core part of [secure coding](/en/page-secure-coding) — the goal is that even an attacker who captures your ciphertext gains nothing without the key.

@@ -1,19 +1,63 @@
 ---
-import AvatarList from './AvatarList.astro';
+import * as CONFIG from '../../config';
+
 type Props = {
 	path: string;
 };
 const { path } = Astro.props as Props;
+const editUrl = `${CONFIG.GITHUB_EDIT_URL}/${path}`;
+const year = new Date().getFullYear();
 ---
 
 <footer>
-	<AvatarList path={path} />
+	<div class="footer-inner">
+		<div class="footer-links">
+			<a href={editUrl} target="_blank" rel="noopener noreferrer">Edit this page</a>
+			<a href={CONFIG.GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer">GitHub</a>
+			<a href={CONFIG.PATREON_URL} target="_blank" rel="noopener noreferrer">Support on Patreon</a>
+		</div>
+		<p class="footer-note">
+			© {year} Hackers Handbook Vol. 1 · For educational use only · MIT Licensed
+		</p>
+	</div>
 </footer>
 
 <style>
 	footer {
 		margin-top: auto;
 		padding: 2rem;
-		border-top: 3px solid var(--theme-divider);
+		border-top: 1px solid var(--theme-divider);
+	}
+
+	.footer-inner {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		max-width: var(--max-width);
+	}
+
+	.footer-links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.25rem;
+	}
+
+	.footer-links a {
+		color: var(--theme-text-accent);
+		font-weight: 500;
+		text-decoration: none;
+	}
+
+	.footer-links a:hover {
+		text-decoration: underline;
+		opacity: 1;
+	}
+
+	.footer-note {
+		color: var(--theme-text-lighter);
+		font-size: 0.85rem;
+		margin: 0;
 	}
 </style>

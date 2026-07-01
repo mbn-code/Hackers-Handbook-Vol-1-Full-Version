@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hackers-handbook-vol-1.netlify.app/sitemap-index.xml
