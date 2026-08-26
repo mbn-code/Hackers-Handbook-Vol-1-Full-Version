@@ -19,7 +19,7 @@ const lang = getLanguageFromURL(currentPage);
 	<SkipToContent />
 	<nav class="nav-wrapper" title="Top Navigation">
 		<div class="menu-toggle">
-			<SidebarToggle client:idle />
+			<SidebarToggle />
 		</div>
 		<div class="logo flex">
 			<a href="/">
@@ -27,7 +27,9 @@ const lang = getLanguageFromURL(currentPage);
 				<h1>{CONFIG.SITE.title ?? 'Documentation'}</h1>
 			</a>
 		</div>
-
+		<div class="language-select-item">
+			<LanguageSelect lang={lang} />
+		</div>
 	</nav>
 </header>
 

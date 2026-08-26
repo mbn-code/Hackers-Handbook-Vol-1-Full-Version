@@ -1,0 +1,47 @@
+.challenge-card {
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 1em;
+  margin: 1.5em 0;
+  background: #181a1b;
+  box-shadow: 0 2px 8px #0002;
+}
+.challenge-prompt {
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+.challenge-btn {
+  margin: 0.5em 0.5em 0.5em 0;
+  background: #222;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.4em 1em;
+  cursor: pointer;
+}
+.challenge-hint {
+  background: #23272e;
+  padding: 0.5em;
+  border-radius: 4px;
+  margin-bottom: 0.5em;
+  color: #b3b3b3;
+}
+.challenge-solution {
+  margin-top: 0.5em;
+  background: #23272e;
+  padding: 0.5em;
+  border-radius: 4px;
+  color: #b3b3b3;
+  filter: blur(6px);
+  transition: filter 0.2s;
+  user-select: none;
+}
+.challenge-solution.revealed {
+  filter: none;
+  color: #fff;
+  user-select: text;
+}
+.spoiler-blur {
+  color: #888;
+  font-style: italic;
+}

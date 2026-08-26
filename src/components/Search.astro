@@ -1,0 +1,15 @@
+---
+// No props needed
+---
+<div id="search"></div>
+<script type="text/javascript" is:inline>
+  window.addEventListener('DOMContentLoaded', () => {
+    if (window.PagefindUI) {
+      new window.PagefindUI({
+        element: "#search",
+        showSubResults: true,
+        showImages: false,
+      });
+    }
+  });
+</script>

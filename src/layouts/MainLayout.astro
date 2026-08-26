@@ -28,6 +28,7 @@ const githubEditUrl = `${CONFIG.GITHUB_EDIT_URL}/${currentFile}`;
 		<title>
 			{frontmatter.title ? `${frontmatter.title} 🚀 ${CONFIG.SITE.title}` : CONFIG.SITE.title}
 		</title>
+		<link rel="stylesheet" href="/pagefind/pagefind-ui.css">
 		<style>
 			body {
 				width: 100%;
@@ -121,6 +122,7 @@ const githubEditUrl = `${CONFIG.GITHUB_EDIT_URL}/${currentFile}`;
 
 	<body>
 		<Header currentPage={currentPage} />
+		<script src="/pagefind/pagefind-ui.js" type="text/javascript"></script>
 		<main class="layout">
 			<aside id="grid-left" class="grid-sidebar" title="Site Navigation">
 				<LeftSidebar currentPage={currentPage} />
@@ -137,3 +139,7 @@ const githubEditUrl = `${CONFIG.GITHUB_EDIT_URL}/${currentFile}`;
 		<Footer path={currentFile} />
 	</body>
 </html>
+		<!-- Pagefind Search Bar -->
+		<div style="max-width: 700px; margin: 2rem auto 0 auto;">
+			{Astro.glob('../components/Search.astro').then(([Search]) => <Search.default />)}
+		</div>
